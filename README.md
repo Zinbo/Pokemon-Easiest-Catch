@@ -59,3 +59,9 @@ Backend (get and service data)
 - Google cloud Endpoints - API gateway
 - Mongo to store data 
 - Spring Cloud with GCP
+
+## Notes
+### Flutter
+- flutterstudio.app
+- flare IDE?
+- Android studio has widget inspector which is a useful tool
