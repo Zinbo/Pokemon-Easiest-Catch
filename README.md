@@ -30,7 +30,7 @@ This app tells you the easiest way to get each pokemon, depending what games you
 
 ## To do
 ## Set up Tasks
-- [ ] watch course to get basic understanding of flutter
+- [x] watch course to get basic understanding of flutter
 - [ ] Set up Flutter application
 - [ ] Do a Kotlin primer
 - [ ] Do a Spring WebFlux tutorial
@@ -40,6 +40,26 @@ This app tells you the easiest way to get each pokemon, depending what games you
 - [ ] Set up Spring app with Spring Cloud and deploy on GCP
 - [ ] Watch course on Firebase
 - [ ] Set up firebase with flutter app
+
+## Flutter Tasks
+
+### Splash Screen
+- [ ] Design simple splash screen
+- [ ] download pokemon data if doesn't exist
+
+
+### Pokemon Home Screen
+- [ ] Move pokemon screen into seperate class
+- [ ] Save 10 assets locally for ease of use
+- [ ] Display filter icon
+- [ ] Link clicking pokemon to new page
+- [ ] Find way to "grey" out images of pokemon
+- [ ] Decide on what data to hold per pokemon
+- [ ] Open up menu when clicking filter icon with different options
+- [ ] 
+
+### Pokemon View Screen
+
 
 ## Technologies
 App
