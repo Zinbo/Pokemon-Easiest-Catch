@@ -120,15 +120,89 @@ class _PokemonHomeState extends State<PokemonHomePage> {
           title: Text(title),
           actions: <Widget>[
             PopupMenuButton<String>(
+
               icon: Icon(Icons.filter_list),
               onSelected: choiceAction,
               itemBuilder: (BuildContext context){
-                return Constants.choices.map((String choice){
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
+                var list = List<PopupMenuEntry<String>>();
+                list.add(
+                  PopupMenuItem(
+                    child: Text("Filter by:")
+                  )
+                );
+
+                list.add(
+                    PopupMenuItem(
+                        child: ExpansionTile(
+                            title: Text("Game"),
+                            children: <Widget>[
+                              CheckboxListTile(
+                                  title: Text("Red"),
+                                  value: false),
+                              CheckboxListTile(
+                                  title: Text("Blue"),
+                                  value: false),
+                              CheckboxListTile(
+                                  title: Text("Yellow"),
+                                  value: false),
+                              CheckboxListTile(
+                                  title: Text("Gold"),
+                                  value: false),
+                              CheckboxListTile(
+                                  title: Text("Silver"),
+                                  value: false),
+                              CheckboxListTile(
+                                  title: Text("Crystal"),
+                                  value: false),
+                              CheckboxListTile(
+                                  title: Text("Ruby"),
+                                  value: false),
+                              CheckboxListTile(
+                                  title: Text("Saphire"),
+                                  value: false),
+                              CheckboxListTile(
+                                  title: Text("Emerald"),
+                                  value: false),
+                            ]
+                        )
+                    )
+                );
+
+                list.add(
+                    PopupMenuItem(
+
+                        child: ExpansionTile(
+                            title: Text("Owned"),
+                            children: <Widget>[
+                              RadioListTile(
+                                  title: Text("Owned"),
+                                  value: false),
+                              RadioListTile(
+                                  title: Text("Not Owned"),
+                                  value: false)
+                            ]
+                        )
+                    )
+                );
+
+                list.add(
+                    PopupMenuItem(
+
+                        child: ExpansionTile(
+                            title: Text("Breeding"),
+                            children: <Widget>[
+                              CheckboxListTile(
+                                  title: Text("Can be bred"),
+                                  value: false),
+                              CheckboxListTile(
+                                  title: Text("Cannot be bred"),
+                                  value: false)
+                            ]
+                        )
+                    )
+                );
+
+                return list;
               },
             )
 //            IconButton(icon: Icon(Icons.filter_list), onPressed: ,)
@@ -148,10 +222,17 @@ class _PokemonHomeState extends State<PokemonHomePage> {
                     children: List.generate(loadedSprites.length, (index) {
                       return Center(
                         child: Transform.scale(
-                        scale: 1,
+                        scale: 1.2,
                         child: new Container(
                             decoration: BoxDecoration(
                                 image: DecorationImage(
+
+                                    colorFilter: ColorFilter.matrix(<double>[
+                                      0.2126,0.7152,0.0722,0,0,
+                                      0.2126,0.7152,0.0722,0,0,
+                                      0.2126,0.7152,0.0722,0,0,
+                                      0,0,0,1,0,
+                                    ]),
                                     image: NetworkImage(
                                         loadedSprites[index].sprites.frontDefault),
                                     fit: BoxFit.cover
