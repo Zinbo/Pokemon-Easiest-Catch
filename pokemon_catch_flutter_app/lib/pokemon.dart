@@ -3,6 +3,7 @@ import 'dart:convert';
 
 class Game {
   String name;
+  static List<Game> loadedGames;
 
   Game({this.name});
 
@@ -11,9 +12,17 @@ class Game {
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var gamesJson = json.decode(response.body);
-      Iterable l = gamesJson["results"];
-      return l.map((model) => Game.fromJson(json.decode(model));
+      List results = gamesJson["results"];
+      Game.loadedGames = results.map((model) => Game.fromJson(model)).toList();
+      return loadedGames;
     }
+    else {
+      throw("status code: ${response.statusCode} body: ${response.body}");
+    }
+  }
+
+  static getGame(String name) {
+    return loadedGames.firstWhere((game) => game.name == name);
   }
 
   factory Game.fromJson(Map<String, dynamic> resultJson) {
@@ -34,7 +43,7 @@ class Encounter {
     if (response.statusCode == 200) {
       Iterable l = json.decode(response.body);
       return l.map((model) => Encounter
-          .getEncountersForLocation(json.decode(model))).toList()
+          .getEncountersForLocation(model)).toList()
           .expand((a) => a).toList();
     }
   }
@@ -42,7 +51,7 @@ class Encounter {
   static List<Encounter> getEncountersForLocation(Map<String, dynamic> encounterForLocationJson) {
     String location = encounterForLocationJson['location_area']['name'];
     Iterable versionDetails = encounterForLocationJson['version_details'];
-    return versionDetails.map((version) => Encounter.fromJson(location, json.decode(version)));
+    return versionDetails.map((version) => Encounter.fromJson(location, version)).toList();
 
   }
 
@@ -55,7 +64,7 @@ class Encounter {
 
 class Pokemon {
   int _id;
-  String _imageUrl;
+  String imageUrl;
   String _name;
   Set<Game> _games = new Set<Game>();
   List<Encounter> _encounters;
@@ -64,12 +73,12 @@ class Pokemon {
   Pokemon(int id, String name, String imageUrl) {
     this._id = id;
     this._name = name;
-    this._imageUrl = imageUrl;
+    this.imageUrl = imageUrl;
   }
 
   static Future<List<Pokemon>> loadPokemon() async {
     // get base pokemon details
-    var baseUrl = "https://pokeapi.co/api/v2/pokemon";
+    var baseUrl = "https://pokeapi.co/api/v2/pokemon/";
     var pokemen = new List<Pokemon>();
     for(int i = 1; i <= 10; i++) {
       final response = await http.get(baseUrl + i.toString());
@@ -82,11 +91,13 @@ class Pokemon {
 
         // get games from encounters
         encounters.forEach((element) => pokemon._games.add(element.game));
-
+      }
+      else {
+        throw("status: ${response.statusCode} body: ${response.body}");
       }
     }
 
-
+    return pokemen;
   }
 
   factory Pokemon.fromJson(Map<String, dynamic> json) {
