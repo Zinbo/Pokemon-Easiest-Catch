@@ -10,7 +10,10 @@ This app tells you the easiest way to get each pokemon, depending what games you
 ## How to use
 
 ## Features
-- User can select the games that they own to decide on best game to capture each pokemon
+- Users can see all pokemon in infinite scrolling list
+- Users can filter on games to see which pokemon appear in which games
+- Pokemon not caught appear as greyed out in list
+- User save a list of games that they own to decide on best game to capture each pokemon
 - Will show, in descending order, the best places to catch each pokemon
 - User can tick off the pokemon they have for easier viewing, and store details about where they are (in pokemon home, on ruby cartridge, etc.)
 - User can filter the list based on:

@@ -13,6 +13,7 @@ class _PokemonListState extends State<PokemonList> {
   List<Game> games;
   List<Pokemon> pokemon;
   Future<void> loadData;
+  List<Game> selectedGames = [];
 
   @override
   void initState() {
@@ -28,7 +29,6 @@ class _PokemonListState extends State<PokemonList> {
   }
 
   Widget filerPopupMenu() {
-    //TODO: want to get data here and display
     return new Container(
       child: new FutureBuilder<void>
         (future: this.loadData,
@@ -52,8 +52,13 @@ class _PokemonListState extends State<PokemonList> {
                       title: Text("Game"),
                       children: this.games.map((game) {
                         return CheckboxListTile(
+                            key: Key(game.name),
                             title: Text(game.name),
-                            value: false);
+                            value: selectedGames.contains(game),
+                            onChanged: (bool selected) {
+                              _filterPokemonByGame(selected, game);
+                            }
+                            );
                       }).toList()
                   )
               )
@@ -109,7 +114,7 @@ class _PokemonListState extends State<PokemonList> {
       home: Scaffold(
         appBar: AppBar(
           title: Text(title),
-          actions: <Widget>[
+          actions: <StatefulWidget>[
             filerPopupMenu()
 //            IconButton(icon: Icon(Icons.filter_list), onPressed: ,)
           ],
@@ -125,6 +130,17 @@ class _PokemonListState extends State<PokemonList> {
                   return GridView.count(
                       crossAxisCount: 8,
                       children: List.generate(pokemon.length, (index) {
+                        if(selectedGames.isNotEmpty) {
+                          bool shouldShowPokemon = false;
+                          for(Game game in selectedGames) {
+                            if(pokemon[index].games.contains(game)) {
+                              shouldShowPokemon = true;
+                              break;
+                            }
+                          }
+
+                          if(!shouldShowPokemon) return Container();
+                        }
                         return Center(
                             child: Transform.scale(
                               scale: 1.2,
@@ -139,8 +155,7 @@ class _PokemonListState extends State<PokemonList> {
                                                 0.2126, 0.7152, 0.0722, 0, 0,
                                                 0, 0, 0, 1, 0,
                                               ]),
-                                          image: NetworkImage(
-                                              pokemon[index].imageUrl),
+                                          image: NetworkImage(pokemon[index].imageUrl),
                                           fit: BoxFit.cover
                                       )
                                   )
@@ -156,5 +171,12 @@ class _PokemonListState extends State<PokemonList> {
         ),
       ),
     );
+  }
+
+  void _filterPokemonByGame(bool selected, Game game) {
+    setState(() {
+      if(selected) selectedGames.add(game);
+      else selectedGames.remove(game);
+    });
   }
 }

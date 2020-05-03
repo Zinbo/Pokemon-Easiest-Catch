@@ -66,7 +66,7 @@ class Pokemon {
   int _id;
   String imageUrl;
   String _name;
-  Set<Game> _games = new Set<Game>();
+  Set<Game> games = new Set<Game>();
   List<Encounter> _encounters;
   bool _acquired = false;
 
@@ -90,7 +90,7 @@ class Pokemon {
         var encounters = await Encounter.getEncountersForPokemon(pokemon._id);
 
         // get games from encounters
-        encounters.forEach((element) => pokemon._games.add(element.game));
+        encounters.forEach((element) => pokemon.games.add(element.game));
       }
       else {
         throw("status: ${response.statusCode} body: ${response.body}");
