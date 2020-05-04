@@ -2,26 +2,25 @@ import 'package:flutter/material.dart';
 import 'pokemon.dart';
 
 class PokemonList extends StatefulWidget {
-  PokemonList({Key key}) : super(key: key);
+  List<Pokemon> pokemon;
+  List<Game> games;
+
+  PokemonList({Key key, this.pokemon, this.games}) : super(key: key);
 
   @override
   _PokemonListState createState() => _PokemonListState();
 }
 
 class _PokemonListState extends State<PokemonList> {
-
-  List<Game> games;
   List<Pokemon> pokemon;
-  Future<void> loadData;
+  List<Game> games;
   List<Game> selectedGames = [];
 
   @override
   void initState() {
     super.initState();
-    loadData = Game.loadGames().then((games) {
-      this.games = games;
-      return Pokemon.loadPokemon();
-    }).then((pokemon) => this.pokemon = pokemon);
+    pokemon = this.widget.pokemon;
+    games = this.widget.games;
   }
 
   void printChoice(String choice) {
@@ -30,11 +29,7 @@ class _PokemonListState extends State<PokemonList> {
 
   Widget filerPopupMenu() {
     return new Container(
-      child: new FutureBuilder<void>
-        (future: this.loadData,
-        builder: (context, snapshot)
-    {
-      return PopupMenuButton<String>(
+      child: PopupMenuButton<String>(
 
         icon: Icon(Icons.filter_list),
         onSelected: printChoice,
@@ -100,8 +95,7 @@ class _PokemonListState extends State<PokemonList> {
 
           return list;
         },
-      );
-    })
+      )
     );
   }
 
@@ -114,61 +108,50 @@ class _PokemonListState extends State<PokemonList> {
       home: Scaffold(
         appBar: AppBar(
           title: Text(title),
-          actions: <StatefulWidget>[
+          actions: <Widget>[
             filerPopupMenu()
 //            IconButton(icon: Icon(Icons.filter_list), onPressed: ,)
           ],
         ),
         body: new Container(
-            child: FutureBuilder<void>(
-              future: this.loadData,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                }
-                else if (snapshot.connectionState == ConnectionState.done) {
-                  return GridView.count(
-                      crossAxisCount: 8,
-                      children: List.generate(pokemon.length, (index) {
-                        if(selectedGames.isNotEmpty) {
-                          bool shouldShowPokemon = false;
-                          for(Game game in selectedGames) {
-                            if(pokemon[index].games.contains(game)) {
-                              shouldShowPokemon = true;
-                              break;
-                            }
-                          }
+          child: GridView.count(
+              crossAxisCount: 8,
+              children: List.generate(pokemon.length, (index) {
+                if(selectedGames.isNotEmpty) {
+                  bool shouldShowPokemon = false;
+                  for(Game game in selectedGames) {
+                    if(pokemon[index].games.contains(game)) {
+                      shouldShowPokemon = true;
+                      break;
+                    }
+                  }
 
-                          if(!shouldShowPokemon) return Container();
-                        }
-                        return Center(
-                            child: Transform.scale(
-                              scale: 1.2,
-                              child: new Container(
-                                  decoration: BoxDecoration(
-                                      image: DecorationImage(
-
-                                          colorFilter: ColorFilter.matrix(
-                                              <double>[
-                                                0.2126, 0.7152, 0.0722, 0, 0,
-                                                0.2126, 0.7152, 0.0722, 0, 0,
-                                                0.2126, 0.7152, 0.0722, 0, 0,
-                                                0, 0, 0, 1, 0,
-                                              ]),
-                                          image: NetworkImage(pokemon[index].imageUrl),
-                                          fit: BoxFit.cover
-                                      )
-                                  )
-                              ),
-                            )
-                        );
-                      })
-                  );
+                  if(!shouldShowPokemon) return Container();
                 }
-                return CircularProgressIndicator();
-              },
-            )
-        ),
+                return Center(
+                    child: Transform.scale(
+                      scale: 1.2,
+                      child: new Container(
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+
+                                  colorFilter: ColorFilter.matrix(
+                                      <double>[
+                                        0.2126, 0.7152, 0.0722, 0, 0,
+                                        0.2126, 0.7152, 0.0722, 0, 0,
+                                        0.2126, 0.7152, 0.0722, 0, 0,
+                                        0, 0, 0, 1, 0,
+                                      ]),
+                                  image: NetworkImage(pokemon[index].imageUrl),
+                                  fit: BoxFit.cover
+                              )
+                          )
+                      ),
+                    )
+                );
+              })
+          )
+        )
       ),
     );
   }
