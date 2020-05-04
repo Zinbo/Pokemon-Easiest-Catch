@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pokemoncatch/pokemon.dart';
 import 'package:pokemoncatch/pokemon_list.dart';
+import 'package:pokemoncatch/select_games.dart';
 
 class SplashScreen extends StatefulWidget {
   SplashScreen({Key key}) : super(key: key);
@@ -23,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
     }).then((pokemon) {
       this.pokemon = pokemon;
       Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => PokemonList(pokemon: pokemon, games: games)));
+          MaterialPageRoute(builder: (context) => SelectGames(games: games, pokemon: pokemon)));
     });
   }
 

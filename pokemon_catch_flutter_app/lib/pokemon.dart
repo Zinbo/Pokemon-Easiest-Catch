@@ -13,7 +13,9 @@ class Game {
     if (response.statusCode == 200) {
       var gamesJson = json.decode(response.body);
       List results = gamesJson["results"];
-      Game.loadedGames = results.map((model) => Game.fromJson(model)).toList();
+      var games = results.map((model) => Game.fromJson(model)).toList();
+      games.removeWhere((game) => game.name == 'xd' || game.name == 'colosseum');
+      Game.loadedGames = games;
       return loadedGames;
     }
     else {
