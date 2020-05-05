@@ -5,8 +5,8 @@ import 'package:pokemoncatch/pokemon_list.dart';
 import 'pokemon.dart';
 
 class SelectGames extends StatefulWidget {
-  List<Game> games;
-  List<Pokemon> pokemon;
+  final List<Game> games;
+  final List<Pokemon> pokemon;
 
   SelectGames({Key key, this.games, this.pokemon}) : super(key: key);
 
@@ -74,11 +74,7 @@ class _SelectGamesState extends State<SelectGames> {
         ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: need to save
           saveDataAndNavigateToNextPage();
-          // TODO: then show loader whilst waiting
-          // TODO: then navigate to new route
-
         },
         child: Icon(Icons.check),
         backgroundColor: Colors.red,

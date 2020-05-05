@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'database_helpers.dart';
 import 'pokemon.dart';
 
 class PokemonList extends StatefulWidget {
@@ -14,17 +15,16 @@ class PokemonList extends StatefulWidget {
 class _PokemonListState extends State<PokemonList> {
   List<Pokemon> pokemon;
   List<Game> games;
+  Future<List<Game>> savedGames;
   List<Game> selectedGames = [];
+  DatabaseHelper helper = DatabaseHelper.instance;
 
   @override
   void initState() {
     super.initState();
     pokemon = this.widget.pokemon;
     games = this.widget.games;
-  }
-
-  void printChoice(String choice) {
-    print(choice);
+    savedGames = helper.getAllSelectedGames();
   }
 
   Widget filerPopupMenu() {
@@ -32,7 +32,6 @@ class _PokemonListState extends State<PokemonList> {
       child: PopupMenuButton<String>(
 
         icon: Icon(Icons.filter_list),
-        onSelected: printChoice,
         itemBuilder: (BuildContext context) {
           var list = List<PopupMenuEntry<String>>();
           list.add(

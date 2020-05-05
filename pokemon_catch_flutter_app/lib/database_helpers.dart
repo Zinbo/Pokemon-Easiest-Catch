@@ -88,6 +88,12 @@ class DatabaseHelper {
       await db.insert(tableWords, selectedGame.toMap());
     }
   }
+  
+  Future<List<SelectedGame>> getAllSelectedGames() async {
+    Database db = await database;
+    List<Map> maps = await db.query(tableWords);
+    return maps.map((map) => SelectedGame.fromMap(map)).toList();
+  }
 
   Future<SelectedGame> queryWord(int id) async {
     Database db = await database;
