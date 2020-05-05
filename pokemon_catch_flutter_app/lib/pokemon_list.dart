@@ -1,6 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:pokemoncatch/filter_screen.dart';
 import 'database_helpers.dart';
 import 'pokemon.dart';
+
+enum OWNERSHIP_OPTIONS {
+  OWNED,
+  NOT_OWNED,
+  BOTH
+}
+
+class FilterOptions {
+  Set<Game> selectedGames = new Set<Game>();
+  bool hidePokemonNotInSelectedGames = false;
+  OWNERSHIP_OPTIONS ownershipOption = OWNERSHIP_OPTIONS.BOTH;
+
+  FilterOptions(List<Game> allGames) {
+    selectedGames = allGames.toSet();
+  }
+
+  addSelectedGame(Game game) {
+    selectedGames.add(game);
+  }
+
+  removeSelectedGame(Game game) {
+    selectedGames.remove(game);
+  }
+
+  toggleHidePokemon() {
+    hidePokemonNotInSelectedGames = !hidePokemonNotInSelectedGames;
+  }
+
+  changeOwnershipOption(OWNERSHIP_OPTIONS option) {
+    ownershipOption = option;
+  }
+}
 
 class PokemonList extends StatefulWidget {
   final List<Pokemon> pokemon;
@@ -14,17 +47,19 @@ class PokemonList extends StatefulWidget {
 
 class _PokemonListState extends State<PokemonList> {
   List<Pokemon> pokemon;
-  List<Game> games;
+  List<Game> allGames;
   Future<List<Game>> savedGames;
   List<Game> selectedGames = [];
   DatabaseHelper helper = DatabaseHelper.instance;
+  FilterOptions filterOptions;
 
   @override
   void initState() {
     super.initState();
     pokemon = this.widget.pokemon;
-    games = this.widget.games;
+    allGames = this.widget.games;
     savedGames = helper.getAllSelectedGames();
+    filterOptions = new FilterOptions(allGames);
   }
 
   Widget filerPopupMenu() {
@@ -42,37 +77,37 @@ class _PokemonListState extends State<PokemonList> {
 
           list.add(
               PopupMenuItem(
-                  child: ExpansionTile(
-                      title: Text("Game"),
-                      children: this.games.map((game) {
-                        return CheckboxListTile(
-                            key: Key(game.name),
-                            title: Text(game.name),
-                            value: selectedGames.contains(game),
-                            onChanged: (bool selected) {
-                              _filterPokemonByGame(selected, game);
-                            }
-                            );
-                      }).toList()
+                  child: StatefulBuilder(
+                    builder: (context, _setState) =>
+                      ExpansionTile(
+                        title: Text("Game"),
+                        children: this.allGames.map((game) {
+                          return CheckboxListTile(
+                              key: Key(game.name),
+                              title: Text(game.name),
+                              value: selectedGames.contains(game),
+                              onChanged: (bool selected) =>
+                                  changeSelectedGameList(_setState, selected, game));
+                        }).toList()
+                      )
                   )
               )
           );
 
           list.add(
-              PopupMenuItem(
-
-                  child: ExpansionTile(
-                      title: Text("Owned"),
-                      children: <Widget>[
-                        RadioListTile(
-                            title: Text("Owned"),
-                            value: false),
-                        RadioListTile(
-                            title: Text("Not Owned"),
-                            value: false)
-                      ]
-                  )
+            PopupMenuItem(
+              child: ExpansionTile(
+                  title: Text("Owned"),
+                  children: <Widget>[
+                    RadioListTile(
+                        title: Text("Owned"),
+                        value: false),
+                    RadioListTile(
+                        title: Text("Not Owned"),
+                        value: false)
+                  ]
               )
+            )
           );
 
           list.add(
@@ -98,6 +133,14 @@ class _PokemonListState extends State<PokemonList> {
     );
   }
 
+  void changeSelectedGameList(void _setState(VoidCallback fn), bool selected, Game game) {
+    _setState(() {
+      if(selected) selectedGames.add(game);
+      else selectedGames.remove(game);
+    });
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final title = 'Pokemon List';
@@ -108,8 +151,11 @@ class _PokemonListState extends State<PokemonList> {
         appBar: AppBar(
           title: Text(title),
           actions: <Widget>[
-            filerPopupMenu()
-//            IconButton(icon: Icon(Icons.filter_list), onPressed: ,)
+            IconButton(icon: Icon(Icons.filter_list), onPressed: () => {
+              Navigator.push(context,
+                  MaterialPageRoute(builder:
+                      (context) => FilterScreen(games: allGames, filterOptions: filterOptions)))
+            })
           ],
         ),
         body: new Container(
