@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'pokemon.dart';
 
 class PokemonList extends StatefulWidget {
-  List<Pokemon> pokemon;
-  List<Game> games;
+  final List<Pokemon> pokemon;
+  final List<Game> games;
 
   PokemonList({Key key, this.pokemon, this.games}) : super(key: key);
 

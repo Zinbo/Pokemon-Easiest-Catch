@@ -2,14 +2,17 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
+import 'pokemon.dart';
 
 final String tableWords = 'selected_games';
 final String columnId = '_id';
 final String columnName = 'name';
 
-class SelectedGame {
+
+class SelectedGame extends Game {
   int id;
-  String name;
+
+  SelectedGame(this.id, String name) : super(name: name);
 
   SelectedGame.fromMap(Map<String, dynamic> map) {
     id = map[columnId];
@@ -63,7 +66,7 @@ class DatabaseHelper {
   Future _onCreate(Database db, int version) async {
     await db.execute('''
               CREATE TABLE $tableWords (
-                $columnId INTEGER PRIMARY KEY,
+                $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
                 $columnName TEXT NOT NULL
               )
               ''');
@@ -71,10 +74,19 @@ class DatabaseHelper {
 
   // Database helper methods:
 
-  Future<int> insert(SelectedGame word) async {
+  Future<int> insert(Game game) async {
     Database db = await database;
-    int id = await db.insert(tableWords, word.toMap());
+    SelectedGame selectedGame = SelectedGame(null, game.name);
+    int id = await db.insert(tableWords, selectedGame.toMap());
     return id;
+  }
+
+  Future<void> insertAll(List<Game> games) async {
+    Database db = await database;
+    for(Game game in games) {
+      SelectedGame selectedGame = SelectedGame(null, game.name);
+      await db.insert(tableWords, selectedGame.toMap());
+    }
   }
 
   Future<SelectedGame> queryWord(int id) async {
@@ -88,8 +100,4 @@ class DatabaseHelper {
     }
     return null;
   }
-
-// TODO: queryAllWords()
-// TODO: delete(int id)
-// TODO: update(Word word)
 }

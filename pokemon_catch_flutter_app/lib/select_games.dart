@@ -7,7 +7,6 @@ import 'pokemon.dart';
 class SelectGames extends StatefulWidget {
   List<Game> games;
   List<Pokemon> pokemon;
-  List<Game> selectedGames = new List<Game>();
 
   SelectGames({Key key, this.games, this.pokemon}) : super(key: key);
 
@@ -18,22 +17,41 @@ class SelectGames extends StatefulWidget {
 class _SelectGamesState extends State<SelectGames> {
 
   DatabaseHelper helper = DatabaseHelper.instance;
+  List<Game> selectedGames = new List<Game>();
+  Future<void> savingGameData;
 
   List<Widget> gameChips() {
     List<Widget> chips = new List<Widget>();
    chips.addAll(this.widget.games.map((game) {
       return ActionChip(
         label: Text(game.name),
-        backgroundColor: this.widget.selectedGames.contains(game) ? Colors.red : Colors.grey,
+        backgroundColor: this.selectedGames.contains(game) ? Colors.red : Colors.grey,
         onPressed: () {
-          if(this.widget.selectedGames.contains(game)) this.setState(() => this.widget.selectedGames.remove(game));
-          else this.setState(() => this.widget.selectedGames.add(game));
+          if(this.selectedGames.contains(game)) this.setState(() => this.selectedGames.remove(game));
+          else this.setState(() => this.selectedGames.add(game));
         },
       );
     }).toList());
 
    return chips;
   }
+
+  Widget showLoaderIfSavingData() {
+    if(savingGameData == null) return Container();
+    else {
+      return FutureBuilder(
+        future: savingGameData,
+        builder: (context, snapshot) {
+          if(snapshot.connectionState != ConnectionState.done) {
+            return CircularProgressIndicator();
+          }
+          return Container();
+        },
+      );
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +67,7 @@ class _SelectGamesState extends State<SelectGames> {
                 Wrap(
                   children: gameChips(),
                 ),
+                showLoaderIfSavingData()
             ]
             )
           )
@@ -56,14 +75,23 @@ class _SelectGamesState extends State<SelectGames> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // TODO: need to save
+          saveDataAndNavigateToNextPage();
           // TODO: then show loader whilst waiting
           // TODO: then navigate to new route
-          Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => PokemonList(pokemon: this.widget.pokemon, games: this.widget.games)));
+
         },
         child: Icon(Icons.check),
         backgroundColor: Colors.red,
       ),
     );
+  }
+
+  void saveDataAndNavigateToNextPage() async {
+    setState(() {
+      savingGameData = helper.insertAll(selectedGames);
+    });
+    await savingGameData;
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => PokemonList(pokemon: this.widget.pokemon, games: this.widget.games)));
   }
 }
