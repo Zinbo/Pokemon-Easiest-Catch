@@ -20,6 +20,16 @@ class _SelectGamesState extends State<SelectGames> {
   List<Game> selectedGames = new List<Game>();
   Future<void> savingGameData;
 
+  @override
+  void initState() {
+    super.initState();
+    helper.getAllSelectedGames()
+      .then((savedGames) {
+        if(savedGames.isNotEmpty) Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => PokemonList(pokemon: this.widget.pokemon, games: this.widget.games)));
+    });
+  }
+
   List<Widget> gameChips() {
     List<Widget> chips = new List<Widget>();
    chips.addAll(this.widget.games.map((game) {
@@ -50,8 +60,6 @@ class _SelectGamesState extends State<SelectGames> {
       );
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {

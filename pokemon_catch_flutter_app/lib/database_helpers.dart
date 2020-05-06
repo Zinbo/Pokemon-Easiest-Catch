@@ -95,7 +95,7 @@ class DatabaseHelper {
     return maps.map((map) => SelectedGame.fromMap(map)).toList();
   }
 
-  Future<SelectedGame> queryWord(int id) async {
+  Future<SelectedGame> queryGame(int id) async {
     Database db = await database;
     List<Map> maps = await db.query(tableWords,
         columns: [columnId, columnName],
