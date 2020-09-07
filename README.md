@@ -11,7 +11,6 @@ This app tells you the easiest way to get each pokemon, depending what games you
 1. Start up emulator in Android Studio
 2. Deploy application
 
-
 ## Technologies
 App
 - Flutter
@@ -21,3 +20,11 @@ App
 Backend (get and service data)
 - Spring Boot
 - Mongo
+
+## C4
+
+### Context
+![img](./resources/context.jpg)
+
+### Container
+![img](./resources/context.jpg)
