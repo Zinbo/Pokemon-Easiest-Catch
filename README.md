@@ -27,4 +27,4 @@ Backend (get and service data)
 ![img](./resources/context.jpg)
 
 ### Container
-![img](./resources/context.jpg)
+![img](./resources/container.jpg)
