@@ -1,4 +1,4 @@
-package com.example.pokemoneasycatch
+package com.stacktobasics.pokemoneasycatch
 
 import org.junit.Test
 

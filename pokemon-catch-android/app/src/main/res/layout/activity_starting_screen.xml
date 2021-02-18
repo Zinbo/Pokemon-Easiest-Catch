@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#EE0202"
-    tools:context=".StartingScreen">
+    tools:context=".StartingActivity">
 
     <ImageView
         android:id="@+id/imageView"
