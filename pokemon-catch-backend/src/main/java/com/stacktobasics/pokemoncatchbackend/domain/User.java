@@ -5,16 +5,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
-public class Game implements AggregateRoot {
+public class User {
     @Id
     String id;
-    String name;
+    List<Game> ownedGames;
+    List<Pokemon> ownedPokemon;
 
-    public Game(String id, String name) {
+    public User(String id) {
         this.id = id;
-        this.name = name;
     }
+
+    //TODO: Add modify methods
 }
