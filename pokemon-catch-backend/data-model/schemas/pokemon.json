@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "pokedexNumber": {
+      "type": "integer"
+    },
+    "imageId": {
+      "type": "string"
+    },
+    "encounters": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "catchRate": {
+              "type": "integer"
+            },
+            "location": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "game": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "game"
+              ]
+            }
+          },
+          "required": [
+            "catchRate",
+            "location"
+          ]
+        }
+      ]
+    },
+    "evolutions": {
+      "type": "array",
+      "items": [
+        {
+          "type": "integer"
+        }
+      ]
+    }
+  },
+  "required": [
+    "pokedexNumber",
+    "imageId",
+    "encounters",
+    "evolutions"
+  ]
+}

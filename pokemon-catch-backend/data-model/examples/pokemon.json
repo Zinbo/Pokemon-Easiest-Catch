@@ -1,0 +1,14 @@
+{
+  "pokedexNumber": 123,
+  "imageId": "123",
+  "encounters": [
+    {
+      "catchRate": 12,
+      "location": {
+        "name": "Route 22",
+        "game": "red"
+      }
+    }
+  ],
+  "evolutions": [12, 45, 67]
+}

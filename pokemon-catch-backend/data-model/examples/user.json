@@ -1,0 +1,5 @@
+{
+  "id": "123",
+  "ownedGames": ["red", "blue"],
+  "ownedPokemon": [12, 55, 567]
+}
