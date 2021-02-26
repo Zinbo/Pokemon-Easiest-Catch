@@ -9,7 +9,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -20,14 +22,16 @@ public class PokeApiClient {
     private final RestTemplate restTemplate;
     private final boolean shouldGetAllPokemon;
 
-    public PokeApiClient(RestTemplate restTemplate, @Value("${feature-toggle.should-get-all-pokemon}") boolean shouldGetAllPokemon) {
-        this.restTemplate = restTemplate;
+    public PokeApiClient(@Value("${feature-toggle.should-get-all-pokemon}") boolean shouldGetAllPokemon) {
+        this.restTemplate = new RestTemplate();
         this.shouldGetAllPokemon = shouldGetAllPokemon;
     }
 
-    public GameDTO[] getGames() {
+    public List<GameDTO> getGames() {
         String url = POKEAPI_BASE_URL + "version/?limit=40";
-        return restTemplate.getForObject(url, GameDTO[].class);
+        GameDTO[] dtos = restTemplate.getForObject(url, GameDTO[].class);
+        if(dtos == null) return new ArrayList<>();
+        return Arrays.asList(dtos);
     }
 
     public List<PokemonDTO> getPokemon() {
@@ -59,8 +63,10 @@ public class PokeApiClient {
         return allPokemon;
     }
 
-    public EncounterDTO getEncounterForPokemon(Integer id) {
+    public List<EncounterDTO> getEncountersForPokemon(Integer id) {
         String url = String.format("%s/%s/encounters", POKEAPI_BASE_URL, id);
-        return restTemplate.getForObject(url, EncounterDTO.class);
+        EncounterDTO[] dtos = restTemplate.getForObject(url, EncounterDTO[].class);
+        if(dtos == null) return new ArrayList<>();
+        return Arrays.asList(dtos);
     }
 }

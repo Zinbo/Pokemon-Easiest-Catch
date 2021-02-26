@@ -10,10 +10,10 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor
 public class Game implements AggregateRoot {
     @Id
-    String id;
+    Integer id;
     String name;
 
-    public Game(String id, String name) {
+    public Game(Integer id, String name) {
         this.id = id;
         this.name = name;
     }

@@ -12,11 +12,12 @@ import org.springframework.util.StringUtils;
 @NoArgsConstructor
 public class Location {
     String name;
-    Game game;
+    String game;
 
     public Location(@NonNull String name, @NonNull String gameName) {
-        this.name = name;
         if(StringUtils.isEmpty(name)) throw new InvalidInputException("location cannot be blank");
-        //TODO: check that game exists
+        if(StringUtils.isEmpty(gameName)) throw new InvalidInputException("gameName cannot be blank");
+        this.name = name;
+        this.game = gameName;
     }
 }

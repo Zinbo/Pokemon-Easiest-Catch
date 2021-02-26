@@ -16,13 +16,16 @@ import java.util.List;
 @NoArgsConstructor
 public class Pokemon implements AggregateRoot {
     @Id
-    Integer pokedexNumber;
-    String imageId;
-    List<Encounter> encounters = new ArrayList<>();
-    List<Pokemon> evolutions = new ArrayList<>();
+    private Integer pokedexNumber;
+    private String name;
+    private String imageId;
+    private List<Encounter> encounters = new ArrayList<>();
+    private List<Pokemon> evolutions = new ArrayList<>();
 
-    public Pokemon(@NonNull Integer pokedexNumber) {
+    public Pokemon(@NonNull Integer pokedexNumber, @NonNull String name, @NonNull String imageId) {
         this.pokedexNumber = pokedexNumber;
+        this.name = name;
+        this.imageId = imageId;
     }
 
     public void addEncounter(@NonNull Integer catchRate, @NonNull String location, @NonNull String gameName) {
