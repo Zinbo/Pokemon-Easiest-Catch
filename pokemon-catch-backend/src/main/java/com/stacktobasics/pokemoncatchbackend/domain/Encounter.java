@@ -10,10 +10,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Encounter {
-    Integer catchRate;
+    int catchRate;
     Location location;
+    String method;
+    String condition;
 
-    public Encounter(@NonNull Integer catchRate, @NonNull String location, @NonNull String gameName) {
+    public Encounter(@NonNull int catchRate, @NonNull String location, @NonNull String gameName,
+                     @NonNull String method, @NonNull String condition) {
+        this.method = method;
+        this.condition = condition;
         if(catchRate <= 0) throw new InvalidInputException("Catch rate cannot be below 0");
         this.catchRate = catchRate;
         this.location = new Location(location, gameName);
@@ -21,5 +26,17 @@ public class Encounter {
 
     public String getLocationName() {
         return location.getName();
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void increaseCatchRate(int catchRate) {
+        this.catchRate += catchRate;
     }
 }

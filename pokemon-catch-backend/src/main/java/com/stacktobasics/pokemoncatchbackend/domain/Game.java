@@ -4,17 +4,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@Document("Game")
 public class Game implements AggregateRoot {
     @Id
-    Integer id;
+    String id;
     String name;
 
-    public Game(Integer id, String name) {
-        this.id = id;
+    public Game(String name) {
         this.name = name;
     }
 }

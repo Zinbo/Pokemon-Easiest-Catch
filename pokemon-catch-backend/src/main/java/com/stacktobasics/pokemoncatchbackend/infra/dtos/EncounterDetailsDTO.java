@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class EncounterDetailsDTO {
-    @JsonProperty("conditional_values")
-    List<ConditionValueDTO> conditionalValues;
-    Integer chance;
-    MethodDTO method;
+    @JsonProperty("condition_values")
+    public List<ConditionValueDTO> conditionalValues;
+    public Integer chance;
+    public MethodDTO method;
 }

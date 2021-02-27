@@ -1,7 +1,7 @@
 package com.stacktobasics.pokemoncatchbackend.infra;
 
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.EncounterDTO;
-import com.stacktobasics.pokemoncatchbackend.infra.dtos.GameDTO;
+import com.stacktobasics.pokemoncatchbackend.infra.dtos.GamesDTO;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.PokemonDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -27,11 +26,9 @@ public class PokeApiClient {
         this.shouldGetAllPokemon = shouldGetAllPokemon;
     }
 
-    public List<GameDTO> getGames() {
+    public GamesDTO getGames() {
         String url = POKEAPI_BASE_URL + "version/?limit=40";
-        GameDTO[] dtos = restTemplate.getForObject(url, GameDTO[].class);
-        if(dtos == null) return new ArrayList<>();
-        return Arrays.asList(dtos);
+        return restTemplate.getForObject(url, GamesDTO.class);
     }
 
     public List<PokemonDTO> getPokemon() {
@@ -64,7 +61,7 @@ public class PokeApiClient {
     }
 
     public List<EncounterDTO> getEncountersForPokemon(Integer id) {
-        String url = String.format("%s/%s/encounters", POKEAPI_BASE_URL, id);
+        String url = String.format("%s/pokemon/%s/encounters", POKEAPI_BASE_URL, id);
         EncounterDTO[] dtos = restTemplate.getForObject(url, EncounterDTO[].class);
         if(dtos == null) return new ArrayList<>();
         return Arrays.asList(dtos);

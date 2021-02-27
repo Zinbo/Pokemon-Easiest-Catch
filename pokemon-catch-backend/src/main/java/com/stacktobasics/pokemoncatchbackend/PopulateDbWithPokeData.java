@@ -2,9 +2,9 @@ package com.stacktobasics.pokemoncatchbackend;
 
 import com.stacktobasics.pokemoncatchbackend.domain.*;
 import com.stacktobasics.pokemoncatchbackend.infra.PokeApiClient;
-import com.stacktobasics.pokemoncatchbackend.infra.dtos.EncounterDTO;
-import com.stacktobasics.pokemoncatchbackend.infra.dtos.GameDTO;
+import com.stacktobasics.pokemoncatchbackend.infra.dtos.GamesDTO;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,8 +24,8 @@ public class PopulateDbWithPokeData {
 
 
     public void populateGames() {
-        List<GameDTO> games = client.getGames();
-        games.forEach(game -> gameRepository.save(new Game(game.id, game.name)));
+        GamesDTO games = client.getGames();
+        games.results.forEach(game -> gameRepository.save(new Game(game.name)));
 
         List<Pokemon> pokemon = client.getPokemon().stream()
                 .map(dto -> new Pokemon(dto.id, dto.name, dto.sprites.frontDefault))
@@ -35,7 +35,16 @@ public class PopulateDbWithPokeData {
             client.getEncountersForPokemon(p.getPokedexNumber())
                 .forEach(dto ->
                         dto.versionDetails.forEach(v ->
-                                p.addEncounter(v.maxChance, dto.locationArea.name, v.version.name))));
+                                v.encounterDetails.forEach(ed -> {
+                                    if(CollectionUtils.isEmpty(ed.conditionalValues)) {
+                                        p.addEncounter(ed.chance, dto.locationArea.name,
+                                                v.version.name, ed.method.name, "none");
+                                    }
+                                    else ed.conditionalValues.forEach(cv ->
+                                            p.addEncounter(ed.chance, dto.locationArea.name,
+                                            v.version.name, ed.method.name, cv.name));
+
+                                }))));
 
         pokemon.forEach(pokemonRepository::save);
     }

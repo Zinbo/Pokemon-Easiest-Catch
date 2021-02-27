@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +15,13 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@Document("Pokemon")
 public class Pokemon implements AggregateRoot {
     @Id
     private Integer pokedexNumber;
     private String name;
     private String imageId;
-    private List<Encounter> encounters = new ArrayList<>();
+    private EncounterDetails encounterDetails = new EncounterDetails();
     private List<Pokemon> evolutions = new ArrayList<>();
 
     public Pokemon(@NonNull Integer pokedexNumber, @NonNull String name, @NonNull String imageId) {
@@ -28,12 +30,9 @@ public class Pokemon implements AggregateRoot {
         this.imageId = imageId;
     }
 
-    public void addEncounter(@NonNull Integer catchRate, @NonNull String location, @NonNull String gameName) {
-        if(encounters.stream().anyMatch(e -> e.getLocationName().equals(location))) {
-          log.warn("Tried to add encounter to pokemon {} with existing location {}", pokedexNumber, location);
-          return;
-        }
-        encounters.add(new Encounter(catchRate, location, gameName));
+    public void addEncounter(int catchRate, @NonNull String location, @NonNull String gameName,
+                             @NonNull String method, @NonNull String condition) {
+         encounterDetails.addEncounter(catchRate, location, gameName, method, condition);
     }
 
     public void addEvolution(Integer pokedexNumber) {
