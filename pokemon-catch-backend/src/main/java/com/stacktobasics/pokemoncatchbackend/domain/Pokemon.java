@@ -15,7 +15,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@Document("Pokemon")
 public class Pokemon implements AggregateRoot {
     @Id
     private Integer pokedexNumber;

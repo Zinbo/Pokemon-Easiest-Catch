@@ -8,6 +8,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 public class PopulateDbWithPokeData {
@@ -24,9 +25,13 @@ public class PopulateDbWithPokeData {
 
 
     public void populateGames() {
+        List<Game> savedGames = StreamSupport.stream(gameRepository.findAll().spliterator(), false).collect(Collectors.toList());
         GamesDTO games = client.getGames();
-        games.results.forEach(game -> gameRepository.save(new Game(game.name)));
+        games.results.stream().filter(newGame -> savedGames.stream().noneMatch(savedGame -> newGame.name.equals(savedGame.getName())))
+                .forEach(game -> gameRepository.save(new Game(game.name)));
+    }
 
+    public void populatePokemon() {
         List<Pokemon> pokemon = client.getPokemon().stream()
                 .map(dto -> new Pokemon(dto.id, dto.name, dto.sprites.frontDefault))
                 .collect(Collectors.toList());

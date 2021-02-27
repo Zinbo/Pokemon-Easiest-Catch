@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Setter
 @NoArgsConstructor
-@Document("Game")
 public class Game implements AggregateRoot {
     @Id
     String id;
