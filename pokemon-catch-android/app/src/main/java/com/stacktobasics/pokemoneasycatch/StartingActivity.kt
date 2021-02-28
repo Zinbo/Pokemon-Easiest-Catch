@@ -13,8 +13,8 @@ import com.google.gson.reflect.TypeToken
 
 class StartingActivity : AppCompatActivity() {
 
-    private val getGamesUrl = "http://172.22.240.1:8080/games"
-    private val getPokemonUrl = "http://172.22.240.1:8080/pokemon"
+    private val getGamesUrl = "http://172.19.176.1:8080/games"
+    private val getPokemonUrl = "http://172.19.176.1:8080/pokemon"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +28,7 @@ class StartingActivity : AppCompatActivity() {
         getGames(queue)
         getPokemon(queue)
         queue.addRequestFinishedListener<Any> {
-            noOfRequestsCompleted++;
+            noOfRequestsCompleted++
             if(noOfRequestsCompleted == 2) {
                 pb.visibility = ProgressBar.VISIBLE
                 startActivity(activityIntent)

@@ -14,4 +14,5 @@ data class Location(val name: String, val game: String)
 object Store {
     var games: List<Game> = emptyList()
     var pokemon: List<Pokemon> = emptyList();
+    var ownedGames: MutableList<Game> = mutableListOf();
 }
