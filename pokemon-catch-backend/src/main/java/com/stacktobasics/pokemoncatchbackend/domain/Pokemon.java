@@ -1,12 +1,8 @@
 package com.stacktobasics.pokemoncatchbackend.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode
 public class Pokemon implements AggregateRoot {
     @Id
     private Integer pokedexNumber;

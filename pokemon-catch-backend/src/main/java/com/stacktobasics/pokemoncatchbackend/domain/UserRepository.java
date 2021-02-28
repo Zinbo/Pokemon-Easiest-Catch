@@ -4,7 +4,8 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface GameRepository extends CrudRepository<Game, String> {
+public interface UserRepository extends CrudRepository<User, String> {
+
     @Override
-    List<Game> findAll();
+    List<User> findAll();
 }
