@@ -3,6 +3,7 @@ package com.stacktobasics.pokemoncatchbackend.api;
 import com.stacktobasics.pokemoncatchbackend.domain.GameRepository;
 import com.stacktobasics.pokemoncatchbackend.domain.User;
 import com.stacktobasics.pokemoncatchbackend.domain.UserRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,13 +21,14 @@ public class UserController {
     }
 
     @PostMapping("/{id}/games")
-    public void saveGames(@PathVariable String id, @RequestBody List<String> games) {
+    public ResponseEntity<User> saveGames(@PathVariable String id, @RequestBody List<String> games) {
         // TODO: Set up users properly
         if(userRepository.findAll().isEmpty()) userRepository.save(new User());
 
         User user = userRepository.findAll().get(0);
         user.addGames(games, gameRepository);
         userRepository.save(user);
+        return ResponseEntity.ok(user);
     }
 
 }

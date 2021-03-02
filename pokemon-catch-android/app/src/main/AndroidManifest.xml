@@ -15,8 +15,7 @@
         <activity android:name=".PokemonListActivity"></activity>
         <activity android:name=".SelectGamesActivity" />
         <activity
-            android:name=".StartingActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".StartingActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

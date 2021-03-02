@@ -11,8 +11,11 @@ data class Encounter(val catchRate: Int, val location: Location, val method: Str
 
 data class Location(val name: String, val game: String)
 
+data class User(val id: String, val ownedGames: Set<Game>, val ownedPokemon: Set<Pokemon>)
+
 object Store {
     var games: List<Game> = emptyList()
     var pokemon: List<Pokemon> = emptyList();
     var ownedGames: MutableList<Game> = mutableListOf();
+    var user: User? = null
 }

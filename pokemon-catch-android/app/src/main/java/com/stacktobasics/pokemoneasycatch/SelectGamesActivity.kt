@@ -7,15 +7,14 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonArrayRequest
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_select_games.*
-import org.json.JSONArray
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+
 
 class SelectGamesActivity : AppCompatActivity() {
 
@@ -34,36 +33,39 @@ class SelectGamesActivity : AppCompatActivity() {
             setChipClickListener(chip, originalColour)
             ll.addView(chip, lp)
         }
-        val loadingDialog = LoadingDialog(this)
-        val queue = HttpClient.getInstance(this.applicationContext).requestQueue
-        val activityIntent = Intent(this, PokemonListActivity::class.java)
 
-        fab.setOnClickListener {
-            loadingDialog.showDialog()
-            saveGames(queue);
-            queue.addRequestFinishedListener<Any> {
-                loadingDialog.dismissDialog()
-                startActivity(activityIntent)
-            }
-            // call API and save owned games
-            // show loading icon
-        }
-    }
-
-    private fun saveGames(queue: RequestQueue) {
         val gameNames = mutableListOf<String>()
         Store.ownedGames.forEach {
             gameNames.add(it.name)
         }
-        val saveGamesRequest = JsonArrayRequest(
-            Request.Method.POST, usersGamesUrl, JSONArray(Gson().toJson(gameNames)),
-            Response.Listener { },
-            Response.ErrorListener { error ->
-                println("Save games request failed")
-                println("Pokemon status code: " + error.networkResponse.statusCode)
-            })
 
-        queue.add(saveGamesRequest)
+        val loadingDialog = LoadingDialog(this)
+        val activityIntent = Intent(this, PokemonListActivity::class.java)
+        fab.setOnClickListener {
+            loadingDialog.showDialog()
+            saveGamesAndNavigateToNextPage(gameNames, loadingDialog, activityIntent)
+        }
+    }
+
+    private fun saveGamesAndNavigateToNextPage(
+        gameNames: MutableList<String>,
+        loadingDialog: LoadingDialog,
+        activityIntent: Intent
+    ) {
+        RestClient.backendAPI.saveGamesForUser(gameNames).enqueue(object : Callback<User> {
+            override fun onResponse(call: Call<User>, response: Response<User>) {
+                if (response.isSuccessful) {
+                    Store.user = response.body()
+                    loadingDialog.dismissDialog()
+                    startActivity(activityIntent)
+                }
+            }
+
+            override fun onFailure(call: Call<User>, t: Throwable) {
+                println("Exception when saving owned games: " + t.message)
+                throw t
+            }
+        })
     }
 
     private fun setChipClickListener(chip: Chip, originalColour: ColorStateList?) {
