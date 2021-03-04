@@ -26,10 +26,18 @@ class HttpClient constructor(val context: Context) {
 }
 
 object RestClient {
-    val retrofit: Retrofit = Retrofit.Builder()
+    val backendRetrofit: Retrofit = Retrofit.Builder()
         .baseUrl("http://172.19.176.1:8080/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val backendAPI = retrofit.create(BackendAPI::class.java)
+    val backendAPI = backendRetrofit.create(BackendAPI::class.java)
+
+/*    val pokeAPIRetrofit: Retrofit = Retrofit.Builder()
+        .baseUrl("https://raw.githubusercontent.com/PokeAPI/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+        .build()
+
+    val pokeAPI = pokeAPIRetrofit.create(PokeAPI::class.java)*/
 }
