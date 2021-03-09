@@ -12,10 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".PokemonListActivity"></activity>
+        <activity android:name=".FilterActivity"></activity>
+        <activity android:name=".PokemonListActivity" />
         <activity android:name=".SelectGamesActivity" />
-        <activity
-            android:name=".StartingActivity">
+        <activity android:name=".StartingActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

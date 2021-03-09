@@ -2,7 +2,10 @@ package com.stacktobasics.pokemoneasycatch
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
@@ -24,6 +27,25 @@ class PokemonListActivity : AppCompatActivity() {
 
         val gridview = findViewById<GridView>(R.id.gridview)
         gridview.adapter = PokemonAdapter(this, Store.pokemon)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.list_view_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        return when(item.itemId) {
+            R.id.action_filter -> {
+                val activityIntent = Intent(this, FilterActivity::class.java)
+                startActivity(activityIntent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }
 
