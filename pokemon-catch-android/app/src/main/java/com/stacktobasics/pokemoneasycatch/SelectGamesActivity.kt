@@ -26,7 +26,7 @@ class SelectGamesActivity : AppCompatActivity() {
 
         val ll = findViewById<View>(R.id.chipGroup) as ChipGroup
         val lp = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        Store.games.forEach { game ->
+        Store.allGames.forEach { game ->
             val chip = Chip(this)
             chip.text = game.name
             val originalColour = chip.chipBackgroundColor
@@ -70,7 +70,7 @@ class SelectGamesActivity : AppCompatActivity() {
     private fun setChipClickListener(chip: Chip, originalColour: ColorStateList?) {
         chip.setOnClickListener {
             var foundGame: Game? = null;
-            for (g in Store.games) {
+            for (g in Store.allGames) {
                 if (g.name == chip.text) {
                     foundGame = g;
                 }

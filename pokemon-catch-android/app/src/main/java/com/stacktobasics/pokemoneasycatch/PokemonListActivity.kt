@@ -26,7 +26,46 @@ class PokemonListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_pokemon_list)
 
         val gridview = findViewById<GridView>(R.id.gridview)
-        gridview.adapter = PokemonAdapter(this, Store.pokemon)
+
+        // get list of pokemon to show
+        // need to remove pokemon not in owned games if hideUnobtainablePokemon is true
+        // need to remove pokemon in ownedPokemon list if hideOwnedPokemon is true
+        val pokemonToShow = mutableListOf<Pokemon>()
+        Store.allPokemon.forEach { pokemon ->
+            // if no hiding selected, add pokemon to list
+            if(!Store.filterOptions.hideUnobtainablePokemon && !Store.filterOptions.hideOwnedPokemon) {
+                pokemonToShow.add(pokemon)
+                return@forEach
+            }
+
+            var shouldHideBecauseOwned = false
+            if(Store.filterOptions.hideOwnedPokemon) {
+                if(Store.ownedPokemon.contains(pokemon)) shouldHideBecauseOwned = true
+            }
+
+            var shouldHideBecauseUnobtainable = false
+            if(Store.filterOptions.hideUnobtainablePokemon) {
+                shouldHideBecauseUnobtainable = true
+                // hide pokemon is it does not have an encounter in a game the user owns
+                val ownedGames: List<String> = Store.ownedGames.map { game -> game.name }
+                for( encounteredGame in pokemon.encounterDetails.encounters.map { encounter -> encounter.location.game }) {
+                    if(!ownedGames.contains(encounteredGame)) continue
+                    shouldHideBecauseUnobtainable = false
+                    break
+                }
+            }
+
+            // if the user has selected to hide owned pokemon and hide unobtainable pokemon, then only
+            // show pokemon if it is both not owned and can be obtained
+            if(Store.filterOptions.hideOwnedPokemon && Store.filterOptions.hideUnobtainablePokemon) {
+                if(!shouldHideBecauseOwned && !shouldHideBecauseUnobtainable) pokemonToShow.add(pokemon)
+            }
+            else if(Store.filterOptions.hideOwnedPokemon && !shouldHideBecauseOwned) pokemonToShow.add(pokemon)
+            else if(!shouldHideBecauseUnobtainable) pokemonToShow.add(pokemon)
+        }
+
+
+        gridview.adapter = PokemonAdapter(this, pokemonToShow)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

@@ -69,7 +69,7 @@
             android:layout_width="182dp"
             android:layout_height="48dp"
             android:text="Hide owned pokemon:"
-            app:layout_constraintBottom_toTopOf="@+id/restButton"
+            app:layout_constraintBottom_toTopOf="@+id/resetButton"
             app:layout_constraintEnd_toStartOf="@+id/hideOwned"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView4" />
@@ -98,13 +98,13 @@
             android:id="@+id/hideOwned"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@+id/restButton"
+            app:layout_constraintBottom_toTopOf="@+id/resetButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textView5"
             app:layout_constraintTop_toBottomOf="@+id/hideUnobtainablePokemon" />
 
         <Button
-            android:id="@+id/restButton"
+            android:id="@+id/resetButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Reset"

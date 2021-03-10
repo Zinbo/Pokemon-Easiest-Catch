@@ -42,7 +42,7 @@ class StartingActivity : AppCompatActivity() {
             Request.Method.GET, getPokemonUrl, null,
             Response.Listener { response ->
                 val type = object : TypeToken<List<Pokemon>>() {}.type
-                Store.pokemon = Gson().fromJson(response.toString(), type)
+                Store.allPokemon = Gson().fromJson(response.toString(), type)
             },
             Response.ErrorListener { error ->
                 println("Pokemon request failed")
@@ -57,7 +57,7 @@ class StartingActivity : AppCompatActivity() {
             Request.Method.GET, getGamesUrl, null,
             Response.Listener { response ->
                 val type = object : TypeToken<List<Game>>() {}.type
-                Store.games = Gson().fromJson(response.toString(), type)
+                Store.allGames = Gson().fromJson(response.toString(), type)
 
                 // TODO: need to get list of filtered games from back end when saved for user
                 Store.filterOptions.selectedGames = Gson().fromJson(response.toString(), type)

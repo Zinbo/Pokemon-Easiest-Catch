@@ -34,10 +34,10 @@ class FilterActivity : AppCompatActivity() {
     }
 
     private fun setupResetButton() {
-        val resetButton = findViewById<Button>(R.id.restButton)
+        val resetButton = findViewById<Button>(R.id.resetButton)
         resetButton.setOnClickListener {
             // on click, reset filter settings
-            Store.filterOptions.selectedGames = Store.games.toMutableList()
+            Store.filterOptions.selectedGames = Store.allGames.toMutableList()
             findViewById<ChipGroup>(R.id.chipGroup).forEach {
                 val chip = it as Chip
                 chip.chipBackgroundColor = selectedColour
@@ -79,7 +79,7 @@ class FilterActivity : AppCompatActivity() {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
 
-        Store.games.forEach { game ->
+        Store.allGames.forEach { game ->
             val chip = Chip(this)
             if (Store.filterOptions.selectedGames.contains(game)) chip.chipBackgroundColor =
                 selectedColour
@@ -93,7 +93,7 @@ class FilterActivity : AppCompatActivity() {
     private fun setChipClickListener(chip: Chip) {
         chip.setOnClickListener {
             var foundGame: Game? = null;
-            for (g in Store.games) {
+            for (g in Store.allGames) {
                 if (g.name == chip.text) {
                     foundGame = g
                 }

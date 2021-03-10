@@ -14,9 +14,10 @@ data class Location(val name: String, val game: String)
 data class User(val id: String, val ownedGames: Set<Game>, val ownedPokemon: Set<Pokemon>)
 
 object Store {
-    var games: List<Game> = emptyList()
-    var pokemon: List<Pokemon> = emptyList()
+    var allGames: List<Game> = emptyList()
+    var allPokemon: List<Pokemon> = emptyList()
     var ownedGames: MutableList<Game> = mutableListOf()
+    var ownedPokemon: MutableList<Pokemon> = mutableListOf()
     var user: User? = null
     var filterOptions = FilterOptions
 }
