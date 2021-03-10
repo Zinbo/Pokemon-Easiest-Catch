@@ -15,7 +15,14 @@ data class User(val id: String, val ownedGames: Set<Game>, val ownedPokemon: Set
 
 object Store {
     var games: List<Game> = emptyList()
-    var pokemon: List<Pokemon> = emptyList();
-    var ownedGames: MutableList<Game> = mutableListOf();
+    var pokemon: List<Pokemon> = emptyList()
+    var ownedGames: MutableList<Game> = mutableListOf()
     var user: User? = null
+    var filterOptions = FilterOptions
+}
+
+object FilterOptions {
+    var selectedGames: MutableList<Game> = mutableListOf()
+    var hideUnobtainablePokemon = false
+    var hideOwnedPokemon = false
 }

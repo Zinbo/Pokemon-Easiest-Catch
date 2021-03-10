@@ -58,6 +58,9 @@ class StartingActivity : AppCompatActivity() {
             Response.Listener { response ->
                 val type = object : TypeToken<List<Game>>() {}.type
                 Store.games = Gson().fromJson(response.toString(), type)
+
+                // TODO: need to get list of filtered games from back end when saved for user
+                Store.filterOptions.selectedGames = Gson().fromJson(response.toString(), type)
             },
             Response.ErrorListener { error ->
                 println("Game request failed")

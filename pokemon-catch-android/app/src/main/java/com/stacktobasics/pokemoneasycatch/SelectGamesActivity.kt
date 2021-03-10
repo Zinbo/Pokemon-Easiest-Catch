@@ -50,8 +50,7 @@ class SelectGamesActivity : AppCompatActivity() {
     private fun saveGamesAndNavigateToNextPage(
         gameNames: MutableList<String>,
         loadingDialog: LoadingDialog,
-        activityIntent: Intent
-    ) {
+        activityIntent: Intent) {
         RestClient.backendAPI.saveGamesForUser(gameNames).enqueue(object : Callback<User> {
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 if (response.isSuccessful) {
