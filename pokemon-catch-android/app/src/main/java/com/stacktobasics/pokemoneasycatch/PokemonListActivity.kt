@@ -25,31 +25,35 @@ class PokemonListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pokemon_list)
 
-        val gridview = findViewById<GridView>(R.id.gridview)
 
+        drawPokemonGridView()
+    }
+
+    private fun drawPokemonGridView() {
         // get list of pokemon to show
         // need to remove pokemon not in owned games if hideUnobtainablePokemon is true
         // need to remove pokemon in ownedPokemon list if hideOwnedPokemon is true
         val pokemonToShow = mutableListOf<Pokemon>()
+        val gridview = findViewById<GridView>(R.id.gridview)
         Store.allPokemon.forEach { pokemon ->
             // if no hiding selected, add pokemon to list
-            if(!Store.filterOptions.hideUnobtainablePokemon && !Store.filterOptions.hideOwnedPokemon) {
+            if (!Store.filterOptions.hideUnobtainablePokemon && !Store.filterOptions.hideOwnedPokemon) {
                 pokemonToShow.add(pokemon)
                 return@forEach
             }
 
             var shouldHideBecauseOwned = false
-            if(Store.filterOptions.hideOwnedPokemon) {
-                if(Store.ownedPokemon.contains(pokemon)) shouldHideBecauseOwned = true
+            if (Store.filterOptions.hideOwnedPokemon) {
+                if (Store.ownedPokemon.contains(pokemon)) shouldHideBecauseOwned = true
             }
 
             var shouldHideBecauseUnobtainable = false
-            if(Store.filterOptions.hideUnobtainablePokemon) {
+            if (Store.filterOptions.hideUnobtainablePokemon) {
                 shouldHideBecauseUnobtainable = true
                 // hide pokemon is it does not have an encounter in a game the user owns
                 val ownedGames: List<String> = Store.ownedGames.map { game -> game.name }
-                for( encounteredGame in pokemon.encounterDetails.encounters.map { encounter -> encounter.location.game }) {
-                    if(!ownedGames.contains(encounteredGame)) continue
+                for (encounteredGame in pokemon.encounterDetails.encounters.map { encounter -> encounter.location.game }) {
+                    if (!ownedGames.contains(encounteredGame)) continue
                     shouldHideBecauseUnobtainable = false
                     break
                 }
@@ -57,15 +61,26 @@ class PokemonListActivity : AppCompatActivity() {
 
             // if the user has selected to hide owned pokemon and hide unobtainable pokemon, then only
             // show pokemon if it is both not owned and can be obtained
-            if(Store.filterOptions.hideOwnedPokemon && Store.filterOptions.hideUnobtainablePokemon) {
-                if(!shouldHideBecauseOwned && !shouldHideBecauseUnobtainable) pokemonToShow.add(pokemon)
-            }
-            else if(Store.filterOptions.hideOwnedPokemon && !shouldHideBecauseOwned) pokemonToShow.add(pokemon)
-            else if(!shouldHideBecauseUnobtainable) pokemonToShow.add(pokemon)
+            if (Store.filterOptions.hideOwnedPokemon && Store.filterOptions.hideUnobtainablePokemon) {
+                if (!shouldHideBecauseOwned && !shouldHideBecauseUnobtainable) pokemonToShow.add(
+                    pokemon
+                )
+            } else if (Store.filterOptions.hideOwnedPokemon && !shouldHideBecauseOwned) pokemonToShow.add(
+                pokemon
+            )
+            else if (!shouldHideBecauseUnobtainable) pokemonToShow.add(pokemon)
         }
 
 
-        gridview.adapter = PokemonAdapter(this, pokemonToShow)
+        val sortedPokemon = when (Store.sort) {
+            SortOptions.NAME_ASC -> pokemonToShow.sortedBy { it.name }
+            SortOptions.NAME_DESC -> pokemonToShow.sortedByDescending { it.name }
+            SortOptions.NUMBER_ASC -> pokemonToShow.sortedBy { it.pokedexNumber }
+            SortOptions.NUMBER_DESC -> pokemonToShow.sortedByDescending { it.pokedexNumber }
+            else -> pokemonToShow
+        }
+
+        gridview.adapter = PokemonAdapter(this, sortedPokemon)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -81,6 +96,26 @@ class PokemonListActivity : AppCompatActivity() {
             R.id.action_filter -> {
                 val activityIntent = Intent(this, FilterActivity::class.java)
                 startActivity(activityIntent)
+                true
+            }
+            R.id.action_name_asc_dropdown -> {
+                Store.sort = SortOptions.NAME_ASC
+                drawPokemonGridView()
+                true
+            }
+            R.id.action_name_desc_dropdown -> {
+                Store.sort = SortOptions.NAME_DESC
+                drawPokemonGridView()
+                true
+            }
+            R.id.action_number_asc_dropdown -> {
+                Store.sort = SortOptions.NUMBER_ASC
+                drawPokemonGridView()
+                true
+            }
+            R.id.action_number_desc_dropdown -> {
+                Store.sort = SortOptions.NUMBER_DESC
+                drawPokemonGridView()
                 true
             }
             else -> super.onOptionsItemSelected(item)

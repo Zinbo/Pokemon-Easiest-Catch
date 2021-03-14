@@ -20,10 +20,30 @@ object Store {
     var ownedPokemon: MutableList<Pokemon> = mutableListOf()
     var user: User? = null
     var filterOptions = FilterOptions
+    var sort = SortOptions.NUMBER_ASC
 }
 
 object FilterOptions {
     var selectedGames: MutableList<Game> = mutableListOf()
     var hideUnobtainablePokemon = false
     var hideOwnedPokemon = false
+}
+
+object SortOptions {
+    val NUMBER_ASC = SortOption(SortType.NUMBER, SortOrder.ASC)
+    val NUMBER_DESC = SortOption(SortType.NUMBER, SortOrder.DESC)
+    val NAME_ASC = SortOption(SortType.NAME, SortOrder.ASC)
+    val NAME_DESC = SortOption(SortType.NAME, SortOrder.DESC)
+}
+
+data class SortOption(val sortType: SortType, val sortOrder: SortOrder)
+
+enum class SortType {
+    NUMBER,
+    NAME
+}
+
+enum class SortOrder {
+    ASC,
+    DESC
 }

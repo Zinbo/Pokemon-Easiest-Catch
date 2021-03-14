@@ -1,11 +1,57 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- "Mark Favorite", should appear as action button if possible -->
+    <item
+        android:id="@+id/action_sort"
+        android:icon="@drawable/ic_sort_black_24dp"
+        android:title="@string/sort"
+        app:showAsAction="always">
+
+        <menu>
+            <group>
+                <item
+                    android:id="@+id/action_number_dropdown"
+                    android:title="@string/number">
+                    <menu>
+                        <group>
+                            <item
+                                android:id="@+id/action_number_asc_dropdown"
+                                android:title="@string/asc"/>
+                            <item
+                                android:id="@+id/action_number_desc_dropdown"
+                                android:title="@string/desc" />
+                        </group>
+                    </menu>
+                </item>
+
+                <item
+                    android:id="@+id/action_name_dropdown"
+                    android:title="@string/name">
+                    <menu>
+                        <group>
+                            <item
+                                android:id="@+id/action_name_asc_dropdown"
+                                android:title="@string/asc"/>
+                            <item
+                                android:id="@+id/action_name_desc_dropdown"
+                                android:title="@string/desc" />
+                        </group>
+                    </menu>
+                </item>
+            </group>
+        </menu>
+    </item>
+
     <item
         android:id="@+id/action_filter"
         android:icon="@drawable/ic_filter_list_black_24dp"
-        android:title="filter"
+        android:title="@string/filter"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/action_settings"
         app:showAsAction="always"/>
 
 </menu>

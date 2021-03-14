@@ -3,4 +3,11 @@
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="add_owned_games">Add Owned Games</string>
+    <string name="asc">ASC</string>
+    <string name="desc">DESC</string>
+    <string name="number">Number</string>
+    <string name="sort">Sort</string>
+    <string name="name">Name</string>
+    <string name="location">Location</string>
+    <string name="filter">filter</string>
 </resources>

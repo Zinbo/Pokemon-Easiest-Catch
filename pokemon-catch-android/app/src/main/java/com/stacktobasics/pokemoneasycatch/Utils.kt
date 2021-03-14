@@ -27,7 +27,7 @@ class HttpClient constructor(val context: Context) {
 
 object RestClient {
     val backendRetrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("http://172.19.176.1:8080/")
+        .baseUrl("http://172.31.80.1:8080/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
