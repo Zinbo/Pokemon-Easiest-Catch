@@ -3,6 +3,8 @@ package com.stacktobasics.pokemoneasycatch
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -49,14 +51,7 @@ class PokemonListActivity : AppCompatActivity() {
 
             var shouldHideBecauseUnobtainable = false
             if (Store.filterOptions.hideUnobtainablePokemon) {
-                shouldHideBecauseUnobtainable = true
-                // hide pokemon is it does not have an encounter in a game the user owns
-                val ownedGames: List<String> = Store.ownedGames.map { game -> game.name }
-                for (encounteredGame in pokemon.encounterDetails.encounters.map { encounter -> encounter.location.game }) {
-                    if (!ownedGames.contains(encounteredGame)) continue
-                    shouldHideBecauseUnobtainable = false
-                    break
-                }
+                shouldHideBecauseUnobtainable = !pokemonCanBeCaught(pokemon)
             }
 
             // if the user has selected to hide owned pokemon and hide unobtainable pokemon, then only
@@ -151,16 +146,24 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>) : BaseAda
         val c = ConstraintLayout(context)
 
         val imageView = ImageView(context)
-        Picasso.get().load(pokemon[position].imageId).into(imageView)
+        val pokemon = pokemon[position]
+        Picasso.get().load(pokemon.imageId).into(imageView)
 
         val set = ConstraintSet()
         imageView.id = 100
         imageView.adjustViewBounds = true
         imageView.layoutParams = ViewGroup.LayoutParams(200, 200)
+        val matrix = ColorMatrix()
+        matrix.setSaturation(0f) //0 means grayscale
+
+        if(!pokemonCanBeCaught(pokemon)) {
+            val cf = ColorMatrixColorFilter(matrix)
+            imageView.colorFilter = cf
+        }
         c.addView(imageView)
 
         val pokemonNameTextView = TextView(context)
-        pokemonNameTextView.text = pokemon[position].name
+        pokemonNameTextView.text = pokemon.name
         pokemonNameTextView.id = 150
         c.addView(pokemonNameTextView)
         set.clone(c)
@@ -184,4 +187,12 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>) : BaseAda
         set.applyTo(c)
         return c
     }
+}
+
+fun pokemonCanBeCaught(pokemon : Pokemon) : Boolean {
+    val ownedGames: List<String> = Store.ownedGames.map { game -> game.name }
+    for (encounteredGame in pokemon.encounterDetails.encounters.map { encounter -> encounter.location.game }) {
+        if (ownedGames.contains(encounteredGame)) return true
+    }
+    return false
 }
