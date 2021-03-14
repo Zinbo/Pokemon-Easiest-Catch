@@ -118,6 +118,12 @@ class PokemonListActivity : AppCompatActivity() {
                 drawPokemonGridView()
                 true
             }
+            R.id.action_settings -> {
+                val activityIntent = Intent(this, SettingsActivity::class.java)
+                startActivity(activityIntent)
+                true
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

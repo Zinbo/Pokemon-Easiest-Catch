@@ -12,7 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".FilterActivity"></activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".FilterActivity" />
         <activity android:name=".PokemonListActivity" />
         <activity android:name=".SelectGamesActivity" />
         <activity android:name=".StartingActivity">
