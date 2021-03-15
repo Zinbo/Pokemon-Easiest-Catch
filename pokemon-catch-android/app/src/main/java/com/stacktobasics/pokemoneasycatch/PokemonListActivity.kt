@@ -38,11 +38,6 @@ class PokemonListActivity : AppCompatActivity() {
         val pokemonToShow = mutableListOf<Pokemon>()
         val gridview = findViewById<GridView>(R.id.gridview)
         Store.allPokemon.forEach { pokemon ->
-            // if no hiding selected, add pokemon to list
-            if (!Store.filterOptions.hideUnobtainablePokemon && !Store.filterOptions.hideOwnedPokemon) {
-                pokemonToShow.add(pokemon)
-                return@forEach
-            }
 
             var shouldHideBecauseOwned = false
             if (Store.filterOptions.hideOwnedPokemon) {
@@ -51,19 +46,18 @@ class PokemonListActivity : AppCompatActivity() {
 
             var shouldHideBecauseUnobtainable = false
             if (Store.filterOptions.hideUnobtainablePokemon) {
-                shouldHideBecauseUnobtainable = !pokemonCanBeCaught(pokemon)
+                shouldHideBecauseUnobtainable = !pokemonCanBeCaught(pokemon, Store.ownedGames)
             }
+
+            val shouldHideBecauseCannotBeCaughtInSelectedGames = !pokemonCanBeCaught(pokemon, Store.filterOptions.selectedGames)
 
             // if the user has selected to hide owned pokemon and hide unobtainable pokemon, then only
             // show pokemon if it is both not owned and can be obtained
-            if (Store.filterOptions.hideOwnedPokemon && Store.filterOptions.hideUnobtainablePokemon) {
-                if (!shouldHideBecauseOwned && !shouldHideBecauseUnobtainable) pokemonToShow.add(
-                    pokemon
-                )
-            } else if (Store.filterOptions.hideOwnedPokemon && !shouldHideBecauseOwned) pokemonToShow.add(
-                pokemon
-            )
-            else if (!shouldHideBecauseUnobtainable) pokemonToShow.add(pokemon)
+            val shouldHide = (Store.filterOptions.hideOwnedPokemon && shouldHideBecauseOwned) ||
+                    (Store.filterOptions.hideUnobtainablePokemon && shouldHideBecauseUnobtainable) ||
+                    shouldHideBecauseCannotBeCaughtInSelectedGames;
+
+            if (!shouldHide) pokemonToShow.add(pokemon)
         }
 
 
@@ -75,7 +69,14 @@ class PokemonListActivity : AppCompatActivity() {
             else -> pokemonToShow
         }
 
-        gridview.adapter = PokemonAdapter(this, sortedPokemon)
+        gridview.adapter = PokemonAdapter(
+            this,
+            sortedPokemon
+        ) { pokedexNumber  : Int  ->
+            val activityIntent = Intent(this, DescriptionActivity::class.java)
+            activityIntent.putExtra("pokedex_number", pokedexNumber)
+            startActivity(activityIntent)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -124,7 +125,7 @@ class PokemonListActivity : AppCompatActivity() {
     }
 }
 
-class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>) : BaseAdapter() {
+class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val startActivityFunc : (Int) -> Unit) : BaseAdapter() {
     // 2
     override fun getCount(): Int {
         return pokemon.size
@@ -156,7 +157,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>) : BaseAda
         val matrix = ColorMatrix()
         matrix.setSaturation(0f) //0 means grayscale
 
-        if(!pokemonCanBeCaught(pokemon)) {
+        if(!pokemonCanBeCaught(pokemon, Store.ownedGames)) {
             val cf = ColorMatrixColorFilter(matrix)
             imageView.colorFilter = cf
         }
@@ -181,16 +182,20 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>) : BaseAda
             ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0)
         set.connect(imageView.getId(), ConstraintSet.RIGHT,
             ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, 0)
-        set.connect(imageView.getId(), ConstraintSet.BOTTOM,
+        set.connect(imageView.id, ConstraintSet.BOTTOM,
             pokemonNameTextView.getId(), ConstraintSet.TOP)
+
+        c.setOnClickListener {
+            startActivityFunc(pokemon.pokedexNumber)
+        }
 
         set.applyTo(c)
         return c
     }
 }
 
-fun pokemonCanBeCaught(pokemon : Pokemon) : Boolean {
-    val ownedGames: List<String> = Store.ownedGames.map { game -> game.name }
+fun pokemonCanBeCaught(pokemon : Pokemon, games : List<Game>) : Boolean {
+    val ownedGames: List<String> = games.map { game -> game.name }
     for (encounteredGame in pokemon.encounterDetails.encounters.map { encounter -> encounter.location.game }) {
         if (ownedGames.contains(encounteredGame)) return true
     }

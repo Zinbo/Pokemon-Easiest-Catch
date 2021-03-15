@@ -1,5 +1,6 @@
 package com.stacktobasics.pokemoncatchbackend.infra;
 
+import com.stacktobasics.pokemoncatchbackend.domain.Pokemon;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.EncounterDTO;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.GamesDTO;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.PokemonDTO;
@@ -37,11 +38,15 @@ public class PokeApiClient {
     }
 
     private List<PokemonDTO> getFirst10Pokemon() {
-        return IntStream.rangeClosed(1, 10)
-                .mapToObj(i -> restTemplate.getForObject(
-                        String.format("%s/pokemon/%s", POKEAPI_BASE_URL, i),
-                        PokemonDTO.class))
-                .collect(Collectors.toList());
+        List<PokemonDTO> pokemons = new ArrayList<>();
+        for (int i = 1; i <= 50; i++) {
+            String url = String.format("%s/pokemon/%s", POKEAPI_BASE_URL, i);
+            PokemonDTO pokemon = restTemplate.getForObject(
+                    url,
+                    PokemonDTO.class);
+            pokemons.add(pokemon);
+        }
+        return pokemons;
     }
 
     private List<PokemonDTO> getAllPokemon() {

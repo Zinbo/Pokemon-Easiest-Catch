@@ -6,6 +6,7 @@ import com.stacktobasics.pokemoncatchbackend.infra.dtos.GamesDTO;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -25,7 +26,7 @@ public class PopulateDbWithPokeData {
 
 
     public void populateGames() {
-        List<Game> savedGames = StreamSupport.stream(gameRepository.findAll().spliterator(), false).collect(Collectors.toList());
+        List<Game> savedGames = new ArrayList<>(gameRepository.findAll());
         GamesDTO games = client.getGames();
         games.results.stream().filter(newGame -> savedGames.stream().noneMatch(savedGame -> newGame.name.equals(savedGame.getName())))
                 .forEach(game -> gameRepository.save(new Game(game.name)));

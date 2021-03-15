@@ -18,3 +18,6 @@ Set-AWSCredential `
                  -StoreAs Admin
 Initialize-AWSDefaultConfiguration -ProfileName Admin -Region eu-west-2
 ```
+
+## Java
+Need to have `-Dhttps.protocols=TLSv1.1,TLSv1.2` to run
