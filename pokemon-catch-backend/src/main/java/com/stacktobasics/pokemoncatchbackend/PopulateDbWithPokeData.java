@@ -34,7 +34,7 @@ public class PopulateDbWithPokeData {
 
     public void populatePokemon() {
         List<Pokemon> pokemon = client.getPokemon().stream()
-                .map(dto -> new Pokemon(dto.id, dto.name, dto.sprites.frontDefault))
+                .map(dto -> new Pokemon(dto.id, dto.name, dto.sprites.frontDefault, dto.sprites.other.officialArtwork.frontDefault))
                 .collect(Collectors.toList());
 
         pokemon.forEach(p ->

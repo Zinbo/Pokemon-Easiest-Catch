@@ -2,7 +2,7 @@ package com.stacktobasics.pokemoneasycatch
 
 data class Game(val name: String)
 
-data class Pokemon(val pokedexNumber: Int, val name: String, val imageId: String,
+data class Pokemon(val pokedexNumber: Int, val name: String, val imageId: String, val officialImage: String,
     val encounterDetails: EncounterDetails)
 
 data class EncounterDetails(val bestCatchRate: Int, val encounters: List<Encounter>)

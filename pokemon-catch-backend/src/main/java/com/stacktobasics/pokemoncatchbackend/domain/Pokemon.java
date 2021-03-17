@@ -17,13 +17,15 @@ public class Pokemon implements AggregateRoot {
     private Integer pokedexNumber;
     private String name;
     private String imageId;
+    private String officialImage;
     private EncounterDetails encounterDetails = new EncounterDetails();
     private List<Pokemon> evolutions = new ArrayList<>();
 
-    public Pokemon(@NonNull Integer pokedexNumber, @NonNull String name, @NonNull String imageId) {
+    public Pokemon(@NonNull Integer pokedexNumber, @NonNull String name, @NonNull String imageId, @NonNull String officialImage) {
         this.pokedexNumber = pokedexNumber;
         this.name = name;
         this.imageId = imageId;
+        this.officialImage = officialImage;
     }
 
     public void addEncounter(int catchRate, @NonNull String location, @NonNull String gameName,
