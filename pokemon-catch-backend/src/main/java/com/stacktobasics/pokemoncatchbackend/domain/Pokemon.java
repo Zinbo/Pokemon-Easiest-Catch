@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "pokedexNumber")
 public class Pokemon implements AggregateRoot {
     @Id
     private Integer pokedexNumber;
@@ -36,4 +36,6 @@ public class Pokemon implements AggregateRoot {
     public void addEvolution(Integer pokedexNumber) {
         //TODO: check that pokedexNumber is valid, get from db, then add as evolution
     }
+
+
 }

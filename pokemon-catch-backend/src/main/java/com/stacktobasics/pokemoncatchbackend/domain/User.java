@@ -1,9 +1,6 @@
 package com.stacktobasics.pokemoncatchbackend.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 
@@ -14,6 +11,7 @@ import java.util.stream.Stream;
 @Setter
 @NoArgsConstructor
 @Slf4j
+@EqualsAndHashCode(of = "id")
 public class User {
     @Id
     String id;

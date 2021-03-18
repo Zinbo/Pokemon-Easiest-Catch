@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "id")
 public class Game implements AggregateRoot {
     @Id
     String id;
