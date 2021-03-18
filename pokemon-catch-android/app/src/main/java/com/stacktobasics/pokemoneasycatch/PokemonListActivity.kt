@@ -41,12 +41,12 @@ class PokemonListActivity : AppCompatActivity() {
 
             var shouldHideBecauseOwned = false
             if (Store.filterOptions.hideOwnedPokemon) {
-                if (Store.ownedPokemon.contains(pokemon)) shouldHideBecauseOwned = true
+                if (Store.user.ownedPokemon.contains(pokemon)) shouldHideBecauseOwned = true
             }
 
             var shouldHideBecauseUnobtainable = false
             if (Store.filterOptions.hideUnobtainablePokemon) {
-                shouldHideBecauseUnobtainable = !pokemonCanBeCaught(pokemon, Store.ownedGames)
+                shouldHideBecauseUnobtainable = !pokemonCanBeCaught(pokemon, Store.user.ownedGames)
             }
 
             val shouldHideBecauseCannotBeCaughtInSelectedGames = !pokemonCanBeCaught(pokemon, Store.filterOptions.selectedGames)
@@ -159,7 +159,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
         val matrix = ColorMatrix()
         matrix.setSaturation(0f) //0 means grayscale
 
-        if(!pokemonCanBeCaught(pokemon, Store.ownedGames)) {
+        if(!pokemonCanBeCaught(pokemon, Store.user.ownedGames)) {
             val cf = ColorMatrixColorFilter(matrix)
             imageView.colorFilter = cf
         }
@@ -171,7 +171,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
 
         rl.addView(imageView)
         rl.addView(check)
-        if(!Store.ownedPokemon.contains(pokemon)) check.visibility = ImageView.INVISIBLE
+        if(!Store.user.ownedPokemon.contains(pokemon)) check.visibility = ImageView.INVISIBLE
         c.addView(rl)
 
         val pokemonNameTextView = TextView(context)
@@ -202,13 +202,13 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
                 GestureDetector.SimpleOnGestureListener() {
                 override fun onDoubleTap(e: MotionEvent?): Boolean {
                     var message = "Added ${pokemon.name} to collection"
-                    if(Store.ownedPokemon.contains(pokemon)) {
+                    if(Store.user.ownedPokemon.contains(pokemon)) {
                         // TODO: set user id properly
                         RestClient.backendAPI.removePokemon("1", pokemon.pokedexNumber).enqueue(object :
                             Callback<User> {
                             override fun onResponse(call: Call<User>, response: Response<User>) {
                                 if (response.isSuccessful) {
-                                    Store.ownedPokemon.remove(pokemon)
+                                    Store.user.ownedPokemon.remove(pokemon)
                                     message = "Removed ${pokemon.name} from collection"
                                     Snackbar.make(
                                         c,
@@ -232,7 +232,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
                             Callback<User> {
                             override fun onResponse(call: Call<User>, response: Response<User>) {
                                 if (response.isSuccessful) {
-                                    Store.ownedPokemon.add(pokemon)
+                                    Store.user.ownedPokemon.add(pokemon)
                                     message = "Added ${pokemon.name} from collection"
                                     Snackbar.make(
                                         c,
@@ -282,16 +282,13 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
         }
 
         c.setOnTouchListener(value)
-        /*c.setOnClickListener {
-            startActivityFunc(pokemon.pokedexNumber)
-        }*/
 
         set.applyTo(c)
         return c
     }
 }
 
-fun pokemonCanBeCaught(pokemon : Pokemon, games : List<Game>) : Boolean {
+fun pokemonCanBeCaught(pokemon : Pokemon, games : Collection<Game>) : Boolean {
     // TODO: Need a better way of handling this, need to handle evolutions
     if(games == Store.allGames) return true
     val ownedGames: List<String> = games.map { game -> game.name }

@@ -37,7 +37,7 @@ class SettingsActivity : AppCompatActivity() {
 
         Store.allGames.forEach { game ->
             val chip = Chip(this)
-            if (Store.ownedGames.contains(game)) chip.chipBackgroundColor =
+            if (Store.user.ownedGames.contains(game)) chip.chipBackgroundColor =
                 selectedColour
             else chip.chipBackgroundColor = notSelectedColour
             chip.text = game.name
@@ -56,11 +56,11 @@ class SettingsActivity : AppCompatActivity() {
             }
             if (foundGame == null) throw IllegalArgumentException("could not find game " + chip.text)
 
-            if (Store.ownedGames.contains(foundGame)) {
-                Store.ownedGames.remove(foundGame)
+            if (Store.user.ownedGames.contains(foundGame)) {
+                Store.user.ownedGames.remove(foundGame)
                 chip.chipBackgroundColor = notSelectedColour
             } else {
-                Store.ownedGames.add(foundGame)
+                Store.user.ownedGames.add(foundGame)
                 chip.chipBackgroundColor = selectedColour
             }
         }

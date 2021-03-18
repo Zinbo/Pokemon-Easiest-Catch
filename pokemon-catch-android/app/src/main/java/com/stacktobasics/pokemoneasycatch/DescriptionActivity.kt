@@ -32,7 +32,7 @@ class DescriptionActivity : AppCompatActivity() {
         val encountersSortedByCatchRate =
             pokemon.encounterDetails.encounters.sortedByDescending { encounter -> encounter.catchRate }
         for (encounter in encountersSortedByCatchRate) {
-            if(!Store.ownedGames.contains(Game(encounter.location.game))) continue;
+            if(!Store.user.ownedGames.contains(Game(encounter.location.game))) continue;
 
             val tableRow = TableRow(context)
 

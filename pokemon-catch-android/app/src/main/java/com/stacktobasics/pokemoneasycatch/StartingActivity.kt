@@ -10,6 +10,9 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 class StartingActivity : AppCompatActivity() {
 
@@ -21,8 +24,9 @@ class StartingActivity : AppCompatActivity() {
         setContentView(R.layout.activity_starting_screen)
 
         val pb : ProgressBar = findViewById(R.id.progressBar)
-        val queue = HttpClient.getInstance(this.applicationContext).requestQueue
-        val activityIntent = Intent(this, SelectGamesActivity::class.java)
+        val selectGamesIntent = Intent(this, SelectGamesActivity::class.java)
+        val pokemonListIntent = Intent(this, PokemonListActivity::class.java)
+        /*val queue = HttpClient.getInstance(this.applicationContext).requestQueue
 
         var noOfRequestsCompleted = 0
         getGames(queue)
@@ -33,6 +37,25 @@ class StartingActivity : AppCompatActivity() {
                 pb.visibility = ProgressBar.VISIBLE
                 startActivity(activityIntent)
             }
+        }*/
+        val getData = Observable.merge(RestClient.backendAPI.getGames()
+            .doOnNext { games ->
+                Store.allGames = games
+                Store.filterOptions.selectedGames = games.toMutableList()
+            },
+            RestClient.backendAPI.getPokemon()
+                .doOnNext { pokemon -> Store.allPokemon = pokemon },
+            RestClient.backendAPI.getUser("1")
+                .doOnNext { user ->
+                    Store.user = user ?: User("1", mutableSetOf(), mutableSetOf())
+                })
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .ignoreElements()
+
+        val subscribe = getData.subscribe {
+            if (Store.user.ownedGames.isEmpty()) startActivity(selectGamesIntent)
+            else startActivity(pokemonListIntent)
         }
 
     }

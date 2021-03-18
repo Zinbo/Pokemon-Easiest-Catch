@@ -35,7 +35,7 @@ class SelectGamesActivity : AppCompatActivity() {
         }
 
         val gameNames = mutableListOf<String>()
-        Store.ownedGames.forEach {
+        Store.user.ownedGames.forEach {
             gameNames.add(it.name)
         }
 
@@ -54,7 +54,8 @@ class SelectGamesActivity : AppCompatActivity() {
         RestClient.backendAPI.saveGamesForUser(gameNames).enqueue(object : Callback<User> {
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 if (response.isSuccessful) {
-                    Store.user = response.body()
+                    val user = response.body()
+                    if(user != null) Store.user = user
                     loadingDialog.dismissDialog()
                     startActivity(activityIntent)
                 }
@@ -77,11 +78,11 @@ class SelectGamesActivity : AppCompatActivity() {
             }
             if (foundGame == null) throw IllegalArgumentException("could not find game " + chip.text)
 
-            if (Store.ownedGames.contains(foundGame)) {
-                Store.ownedGames.remove(foundGame)
+            if (Store.user.ownedGames.contains(foundGame)) {
+                Store.user.ownedGames.remove(foundGame)
                 chip.chipBackgroundColor = originalColour
             } else {
-                Store.ownedGames.add(foundGame)
+                Store.user.ownedGames.add(foundGame)
                 chip.chipBackgroundColor = ColorStateList.valueOf(Color.RED)
             }
         }

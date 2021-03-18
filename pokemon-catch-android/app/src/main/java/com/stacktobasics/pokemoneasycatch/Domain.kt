@@ -11,14 +11,12 @@ data class Encounter(val catchRate: Int, val location: Location, val method: Str
 
 data class Location(val name: String, val game: String)
 
-data class User(val id: String, val ownedGames: Set<Game>, val ownedPokemon: Set<Pokemon>)
+data class User(val id: String, val ownedGames: MutableSet<Game>, val ownedPokemon: MutableSet<Pokemon>)
 
 object Store {
     var allGames: List<Game> = emptyList()
     var allPokemon: List<Pokemon> = emptyList()
-    var ownedGames: MutableList<Game> = mutableListOf()
-    var ownedPokemon: MutableList<Pokemon> = mutableListOf()
-    var user: User? = null
+    lateinit var user: User
     var filterOptions = FilterOptions
     var sort = SortOptions.NUMBER_ASC
 }
