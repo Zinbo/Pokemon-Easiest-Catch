@@ -1,8 +1,6 @@
 package com.stacktobasics.pokemoncatchbackend.api;
 
-import com.stacktobasics.pokemoncatchbackend.domain.GameRepository;
-import com.stacktobasics.pokemoncatchbackend.domain.User;
-import com.stacktobasics.pokemoncatchbackend.domain.UserRepository;
+import com.stacktobasics.pokemoncatchbackend.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +12,12 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final GameRepository gameRepository;
+    private final PokemonRepository pokemonRepository;
 
-    public UserController(UserRepository userRepository, GameRepository gameRepository) {
+    public UserController(UserRepository userRepository, GameRepository gameRepository, PokemonRepository pokemonRepository) {
         this.userRepository = userRepository;
         this.gameRepository = gameRepository;
+        this.pokemonRepository = pokemonRepository;
     }
 
     @PostMapping("/{id}/games")
@@ -29,6 +29,34 @@ public class UserController {
         user.addGames(games, gameRepository);
         userRepository.save(user);
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUser(@PathVariable String id) {
+        // TODO: Set up users properly
+        List<User> users = userRepository.findAll();
+        if(users.isEmpty()) return ResponseEntity.ok().build();
+        return ResponseEntity.ok(users.get(0));
+    }
+
+    @PutMapping("/{userId}/pokemon/{pokedexNumber}")
+    public ResponseEntity<User> savePokemon(@PathVariable String userId, @PathVariable Integer pokedexNumber) {
+        // TODO: Set up users properly
+        if(userRepository.findAll().isEmpty()) userRepository.save(new User());
+
+        User user = userRepository.findAll().get(0);
+        user.addPokemon(pokedexNumber, pokemonRepository);
+        return ResponseEntity.ok(userRepository.save(user));
+    }
+
+    @DeleteMapping("/{userId}/pokemon/{pokedexNumber}")
+    public ResponseEntity<User> deletePokemon(@PathVariable String userId, @PathVariable Integer pokedexNumber) {
+        // TODO: Set up users properly
+        if(userRepository.findAll().isEmpty()) userRepository.save(new User());
+
+        User user = userRepository.findAll().get(0);
+        user.removePokemon(pokedexNumber, pokemonRepository);
+        return ResponseEntity.ok(userRepository.save(user));
     }
 
 }

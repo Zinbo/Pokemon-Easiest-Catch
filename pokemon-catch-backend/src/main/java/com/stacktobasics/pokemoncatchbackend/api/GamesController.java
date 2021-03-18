@@ -3,6 +3,7 @@ package com.stacktobasics.pokemoncatchbackend.api;
 import com.stacktobasics.pokemoncatchbackend.PopulateDbWithPokeData;
 import com.stacktobasics.pokemoncatchbackend.domain.Game;
 import com.stacktobasics.pokemoncatchbackend.domain.GameRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("games")
+@Slf4j
 public class GamesController {
 
     private final PopulateDbWithPokeData populateDbWithPokeData;
@@ -22,7 +24,9 @@ public class GamesController {
 
     @PostMapping("/initialise")
     public void initialiseGames(){
+        log.info("Populating games...");
         populateDbWithPokeData.populateGames();
+        log.info("Populated games.");
     }
 
     @GetMapping

@@ -34,4 +34,14 @@ public class User {
             return matchedGame.stream();
         }).forEach(ownedGames::add);
     }
+
+    public void addPokemon(@NonNull Integer pokedexNumber, @NonNull PokemonRepository pokemonRepository) {
+        Optional<Pokemon> pokemon = pokemonRepository.findById(pokedexNumber);
+        pokemon.ifPresent(p -> ownedPokemon.add(p));
+    }
+
+    public void removePokemon(@NonNull Integer pokedexNumber, @NonNull PokemonRepository pokemonRepository) {
+        Optional<Pokemon> pokemon = pokemonRepository.findById(pokedexNumber);
+        pokemon.ifPresent(p -> ownedPokemon.remove(p));
+    }
 }
