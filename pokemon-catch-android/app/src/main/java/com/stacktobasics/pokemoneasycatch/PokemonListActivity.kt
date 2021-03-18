@@ -6,18 +6,18 @@ import android.content.Intent
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.GridView
-import android.widget.ImageView
-import android.widget.TextView
+import android.util.Log
+import android.view.*
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import kotlin.random.Random
 
 
 class PokemonListActivity : AppCompatActivity() {
@@ -55,7 +55,7 @@ class PokemonListActivity : AppCompatActivity() {
             // show pokemon if it is both not owned and can be obtained
             val shouldHide = (Store.filterOptions.hideOwnedPokemon && shouldHideBecauseOwned) ||
                     (Store.filterOptions.hideUnobtainablePokemon && shouldHideBecauseUnobtainable) ||
-                    shouldHideBecauseCannotBeCaughtInSelectedGames;
+                    shouldHideBecauseCannotBeCaughtInSelectedGames
 
             if (!shouldHide) pokemonToShow.add(pokemon)
         }
@@ -146,6 +146,8 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
         val c = ConstraintLayout(context)
 
+        val rl = RelativeLayout(context)
+        rl.id = Random.nextInt()
         val imageView = ImageView(context)
         val pokemon = pokemon[position]
         Picasso.get().load(pokemon.imageId).into(imageView)
@@ -161,7 +163,16 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
             val cf = ColorMatrixColorFilter(matrix)
             imageView.colorFilter = cf
         }
-        c.addView(imageView)
+
+        val check = ImageView(context)
+        check.background = context.resources.getDrawable(R.drawable.ic_check_black_24dp)
+        check.id = Random.nextInt()
+
+
+        rl.addView(imageView)
+        rl.addView(check)
+        if(!Store.ownedPokemon.contains(pokemon)) check.visibility = ImageView.INVISIBLE
+        c.addView(rl)
 
         val pokemonNameTextView = TextView(context)
         pokemonNameTextView.text = pokemon.name
@@ -176,18 +187,104 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
         set.connect(pokemonNameTextView.getId(), ConstraintSet.BOTTOM,
             ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0)
 
-        set.connect(imageView.getId(), ConstraintSet.TOP,
+        set.connect(rl.getId(), ConstraintSet.TOP,
             ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0)
-        set.connect(imageView.getId(), ConstraintSet.LEFT,
+        set.connect(rl.getId(), ConstraintSet.LEFT,
             ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0)
-        set.connect(imageView.getId(), ConstraintSet.RIGHT,
+        set.connect(rl.getId(), ConstraintSet.RIGHT,
             ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, 0)
-        set.connect(imageView.id, ConstraintSet.BOTTOM,
+        set.connect(rl.id, ConstraintSet.BOTTOM,
             pokemonNameTextView.getId(), ConstraintSet.TOP)
 
-        c.setOnClickListener {
-            startActivityFunc(pokemon.pokedexNumber)
+        val value = object : View.OnTouchListener {
+
+            private val gestureDetector = GestureDetector(context, object :
+                GestureDetector.SimpleOnGestureListener() {
+                override fun onDoubleTap(e: MotionEvent?): Boolean {
+                    var message = "Added ${pokemon.name} to collection"
+                    if(Store.ownedPokemon.contains(pokemon)) {
+                        // TODO: set user id properly
+                        RestClient.backendAPI.removePokemon("1", pokemon.pokedexNumber).enqueue(object :
+                            Callback<User> {
+                            override fun onResponse(call: Call<User>, response: Response<User>) {
+                                if (response.isSuccessful) {
+                                    Store.ownedPokemon.remove(pokemon)
+                                    message = "Removed ${pokemon.name} from collection"
+                                    Snackbar.make(
+                                        c,
+                                        message,
+                                        Snackbar.LENGTH_SHORT
+                                    ).show()
+                                    check.visibility = ImageView.INVISIBLE
+                                }
+                            }
+
+                            override fun onFailure(call: Call<User>, t: Throwable) {
+                                println("Exception when removing pokemon: " + t.message)
+                                throw t
+                            }
+                        })
+
+                    }
+                    else {
+                        // TODO: set user id properly
+                        RestClient.backendAPI.addPokemon("1", pokemon.pokedexNumber).enqueue(object :
+                            Callback<User> {
+                            override fun onResponse(call: Call<User>, response: Response<User>) {
+                                if (response.isSuccessful) {
+                                    Store.ownedPokemon.add(pokemon)
+                                    message = "Added ${pokemon.name} from collection"
+                                    Snackbar.make(
+                                        c,
+                                        message,
+                                        Snackbar.LENGTH_SHORT
+                                    ).show()
+                                    check.visibility = ImageView.VISIBLE
+                                }
+                            }
+
+                            override fun onFailure(call: Call<User>, t: Throwable) {
+                                println("Exception when adding pokemon: " + t.message)
+                                throw t
+                            }
+                        })
+                    }
+
+                    return super.onDoubleTap(e)
+                }
+
+                override fun onLongPress(e: MotionEvent?) {
+                    // not implemented yet
+                    /*val snackbar = Snackbar.make(
+                        c,
+                        "Should start ",
+                        Snackbar.LENGTH_SHORT
+                    )
+                    snackbar.show()*/
+                    return super.onLongPress(e)
+                }
+
+                override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
+                    startActivityFunc(pokemon.pokedexNumber)
+                    return super.onSingleTapConfirmed(e)
+                }
+
+            })
+
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                Log.d(
+                    "TEST",
+                    "Raw event: " + event?.getAction() + ", (" + event?.getRawX() + ", " + event?.getRawY() + ")"
+                );
+                gestureDetector.onTouchEvent(event);
+                return true;
+            }
         }
+
+        c.setOnTouchListener(value)
+        /*c.setOnClickListener {
+            startActivityFunc(pokemon.pokedexNumber)
+        }*/
 
         set.applyTo(c)
         return c
@@ -195,6 +292,8 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
 }
 
 fun pokemonCanBeCaught(pokemon : Pokemon, games : List<Game>) : Boolean {
+    // TODO: Need a better way of handling this, need to handle evolutions
+    if(games == Store.allGames) return true
     val ownedGames: List<String> = games.map { game -> game.name }
     for (encounteredGame in pokemon.encounterDetails.encounters.map { encounter -> encounter.location.game }) {
         if (ownedGames.contains(encounteredGame)) return true

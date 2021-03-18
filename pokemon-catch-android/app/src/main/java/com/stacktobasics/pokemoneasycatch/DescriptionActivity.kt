@@ -29,7 +29,11 @@ class DescriptionActivity : AppCompatActivity() {
         imageView.adjustViewBounds = true
 
         val table = findViewById<TableLayout>(R.id.tableLayout)
-        pokemon.encounterDetails.encounters.sortedByDescending { encounter -> encounter.catchRate }.forEach { encounter ->
+        val encountersSortedByCatchRate =
+            pokemon.encounterDetails.encounters.sortedByDescending { encounter -> encounter.catchRate }
+        for (encounter in encountersSortedByCatchRate) {
+            if(!Store.ownedGames.contains(Game(encounter.location.game))) continue;
+
             val tableRow = TableRow(context)
 
             val gameTextView = TextView(context)
