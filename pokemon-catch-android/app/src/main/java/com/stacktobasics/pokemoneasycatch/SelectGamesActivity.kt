@@ -18,8 +18,6 @@ import retrofit2.Response
 
 class SelectGamesActivity : AppCompatActivity() {
 
-    private val usersGamesUrl = "http://172.31.80.1:8080/users/1/games"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_games)

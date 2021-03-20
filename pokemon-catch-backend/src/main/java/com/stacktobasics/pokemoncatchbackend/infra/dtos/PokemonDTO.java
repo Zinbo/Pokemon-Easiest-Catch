@@ -4,4 +4,5 @@ public class PokemonDTO {
     public Integer id;
     public String name;
     public SpritesDTO sprites;
+    public SpeciesNavigationDTO species;
 }

@@ -1,9 +1,9 @@
 package com.stacktobasics.pokemoncatchbackend.infra;
 
-import com.stacktobasics.pokemoncatchbackend.domain.Pokemon;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.EncounterDTO;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.GamesDTO;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.PokemonDTO;
+import com.stacktobasics.pokemoncatchbackend.infra.dtos.evolution.PokemonEvolutionDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -12,8 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Component
 public class PokeApiClient {
@@ -34,10 +32,10 @@ public class PokeApiClient {
 
     public List<PokemonDTO> getPokemon() {
         if(shouldGetAllPokemon) return getAllPokemon();
-        return getFirst10Pokemon();
+        return getFirst50Pokemon();
     }
 
-    private List<PokemonDTO> getFirst10Pokemon() {
+    private List<PokemonDTO> getFirst50Pokemon() {
         List<PokemonDTO> pokemons = new ArrayList<>();
         for (int i = 1; i <= 50; i++) {
             String url = String.format("%s/pokemon/%s", POKEAPI_BASE_URL, i);
@@ -48,6 +46,10 @@ public class PokeApiClient {
         }
         return pokemons;
     }
+
+//    private PokemonEvolutionDTO getEvolutionChain(String speciesName) {
+//
+//    }
 
     private List<PokemonDTO> getAllPokemon() {
         boolean done = false;
