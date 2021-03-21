@@ -1,10 +1,17 @@
 package com.stacktobasics.pokemoncatchbackend.domain.evolution;
 
-public class TriggerCriteria {
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class TriggerCriterion {
     private String type;
     private String value;
 
-    public TriggerCriteria(String type, String value) {
+    public TriggerCriterion(String type, String value) {
         //TODO: validate these exist
         this.type = type;
         this.value = value;

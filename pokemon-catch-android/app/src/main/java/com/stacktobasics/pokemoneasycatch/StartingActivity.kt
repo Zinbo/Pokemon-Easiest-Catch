@@ -45,6 +45,8 @@ class StartingActivity : AppCompatActivity() {
             },
             RestClient.backendAPI.getPokemon()
                 .doOnNext { pokemon -> Store.allPokemon = pokemon },
+            RestClient.backendAPI.getEvolutionChains()
+                .doOnNext { chains -> Store.allEvolutionChains = chains },
             RestClient.backendAPI.getUser("1")
                 .doOnNext { user ->
                     Store.user = user ?: User("1", mutableSetOf(), mutableSetOf())

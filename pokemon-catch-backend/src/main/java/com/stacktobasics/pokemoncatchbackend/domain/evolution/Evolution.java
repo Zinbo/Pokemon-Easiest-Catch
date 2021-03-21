@@ -1,15 +1,21 @@
 package com.stacktobasics.pokemoncatchbackend.domain.evolution;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Setter;
 import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class Evolution {
-    private final int from;
-    private final int to;
-    private final List<EvolutionCriteria> waysToEvolve = new ArrayList<>();
+    private int from;
+    private int to;
+    private List<EvolutionCriteria> waysToEvolve = new ArrayList<>();
 
     public Evolution(int from, int to, @NonNull List<Pair<String, String>> criteria, @NonNull String trigger) {
         this.from = from;

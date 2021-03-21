@@ -23,4 +23,7 @@ interface BackendAPI {
     @GET("games")
     fun getGames() : Observable<List<Game>>
 
+    @GET("evolution-chains")
+    fun getEvolutionChains() : Observable<List<EvolutionChain>>
+
 }

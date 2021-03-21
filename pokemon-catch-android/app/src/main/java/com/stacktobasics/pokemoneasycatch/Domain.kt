@@ -3,7 +3,17 @@ package com.stacktobasics.pokemoneasycatch
 data class Game(val name: String)
 
 data class Pokemon(val pokedexNumber: Int, val name: String, val imageId: String, val officialImage: String,
-    val encounterDetails: EncounterDetails)
+    val encounterDetails: EncounterDetails, val evolutionChainId: Int)
+
+data class EvolutionChain(val id: Int, val baby: Baby?, val evolutions: List<Evolution>, val allPokemonInChain: List<Int>)
+
+data class Evolution(val from: Int, val to: Int, val waysToEvolve: List<EvolutionCriteria>)
+
+data class EvolutionCriteria(val triggerCriteria: List<TriggerCriterion>, val trigger: String)
+
+data class TriggerCriterion(val type: String, val value: String)
+
+data class Baby(val pokedexNumber: Int, val item: String)
 
 data class EncounterDetails(val bestCatchRate: Int, val encounters: List<Encounter>)
 
@@ -16,6 +26,7 @@ data class User(val id: String, val ownedGames: MutableSet<Game>, val ownedPokem
 object Store {
     var allGames: List<Game> = emptyList()
     var allPokemon: List<Pokemon> = emptyList()
+    var allEvolutionChains: List<EvolutionChain> = emptyList()
     lateinit var user: User
     var filterOptions = FilterOptions
     var sort = SortOptions.NUMBER_ASC
