@@ -19,7 +19,7 @@ public class Pokemon implements AggregateRoot {
     private String imageId;
     private String officialImage;
     private EncounterDetails encounterDetails = new EncounterDetails();
-    private List<Pokemon> evolutions = new ArrayList<>();
+    private int evolutionChainId;
 
     public Pokemon(@NonNull Integer pokedexNumber, @NonNull String name, @NonNull String imageId, @NonNull String officialImage) {
         this.pokedexNumber = pokedexNumber;
@@ -32,10 +32,4 @@ public class Pokemon implements AggregateRoot {
                              @NonNull String method, @NonNull String condition) {
          encounterDetails.addEncounter(catchRate, location, gameName, method, condition);
     }
-
-    public void addEvolution(Integer pokedexNumber) {
-        //TODO: check that pokedexNumber is valid, get from db, then add as evolution
-    }
-
-
 }

@@ -47,9 +47,38 @@ public class PokeApiClient {
         return pokemons;
     }
 
-//    private PokemonEvolutionDTO getEvolutionChain(String speciesName) {
-//
-//    }
+    public List<PokemonEvolutionDTO> getEvolutionChains() {
+        if(shouldGetAllPokemon) return getAllEvolutionChains();
+        return getFirstXEvolutionChains();
+    }
+
+    private List<PokemonEvolutionDTO> getFirstXEvolutionChains() {
+        List<PokemonEvolutionDTO> allEvolutionChains = new ArrayList<>();
+        for (int i = 1; i <= 20; i++) {
+            String url = String.format("%s/evolution-chain/%s", POKEAPI_BASE_URL, i);
+            PokemonEvolutionDTO pokemon = restTemplate.getForObject(
+                    url,
+                    PokemonEvolutionDTO.class);
+            allEvolutionChains.add(pokemon);
+        }
+        return allEvolutionChains;
+    }
+
+    private List<PokemonEvolutionDTO> getAllEvolutionChains() {
+        boolean done = false;
+        List<PokemonEvolutionDTO> allEvolutionChains = new ArrayList<>();
+        int i = 1;
+        while(!done) {
+            try {
+                String url = String.format("%s/evolution-chain/%s", POKEAPI_BASE_URL, i++);
+                allEvolutionChains.add(restTemplate.getForObject(url, PokemonEvolutionDTO.class));
+            } catch(HttpClientErrorException e) {
+                if(e.getRawStatusCode() == 404) done = true;
+                else throw e;
+            }
+        }
+        return allEvolutionChains;
+    }
 
     private List<PokemonDTO> getAllPokemon() {
         boolean done = false;

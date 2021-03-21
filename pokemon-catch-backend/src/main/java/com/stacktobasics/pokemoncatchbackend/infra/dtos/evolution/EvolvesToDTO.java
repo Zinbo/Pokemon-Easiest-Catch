@@ -1,12 +1,15 @@
 package com.stacktobasics.pokemoncatchbackend.infra.dtos.evolution;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.stacktobasics.pokemoncatchbackend.infra.dtos.SpeciesNavigationDTO;
+
+import java.util.List;
 
 public class EvolvesToDTO {
     @JsonProperty("evolution_details")
-    public EvolutionDetailsDTO evolutionDetails;
+    public List<EvolutionDetailsDTO> evolutionDetails;
     @JsonProperty("is_baby")
     public boolean isBaby;
-    public SpeciesNavigationDTO species;
+    public NamedResourceDTO species;
+    @JsonProperty("evolves_to")
+    public List<EvolvesToDTO> evolvesTo;
 }

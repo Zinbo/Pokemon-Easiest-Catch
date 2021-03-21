@@ -23,14 +23,13 @@ public class PokemonController {
 
     @PostMapping("/initialise")
     public void initialisePokemon(){
-        log.info("Populating pokemon...");
+        log.info("Populating pokemon and evolution chains...");
         populateDbWithPokeData.populatePokemon();
-        log.info("Populated pokemon.");
+        log.info("Populated pokemon and evolution chains.");
     }
 
     @GetMapping()
     public Iterable<Pokemon> getPokemon() {
         return pokemonRepository.findAll();
     }
-
 }

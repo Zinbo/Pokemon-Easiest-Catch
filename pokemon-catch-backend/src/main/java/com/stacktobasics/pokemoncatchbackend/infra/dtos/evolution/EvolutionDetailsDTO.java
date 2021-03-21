@@ -5,36 +5,36 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class EvolutionDetailsDTO {
     public Integer gender;
     @JsonProperty("held_item")
-    public String heldItem;
-    public String item;
+    public NamedResourceDTO heldItem;
+    public NamedResourceDTO item;
     @JsonProperty("known_move")
-    public String knownMove;
+    public NamedResourceDTO knownMove;
     @JsonProperty("known_move_type")
-    public String knownMoveType;
-    public LocationDTO location;
+    public NamedResourceDTO knownMoveType;
+    public NamedResourceDTO location;
     @JsonProperty("min_affection")
-    public String minAffection;
+    public Integer minAffection;
     @JsonProperty("min_beauty")
-    public String minBeauty;
+    public Integer minBeauty;
     @JsonProperty("min_happiness")
-    public String minHappiness;
+    public Integer minHappiness;
     @JsonProperty("min_level")
-    public String minLevel;
+    public Integer minLevel;
     @JsonProperty("need_overworld_rain")
-    public boolean needsOverworldRain;
+    public Boolean needsOverworldRain;
     @JsonProperty("party_species")
-    public String partySpecies;
+    public NamedResourceDTO partySpecies;
     @JsonProperty("party_type")
-    public String partyType;
+    public NamedResourceDTO partyType;
     @JsonProperty("relative_physical_stats")
-    public String relativePhysicalStats;
+    public Integer relativePhysicalStats;
     @JsonProperty("time_of_day")
     public String timeOfDay;
     @JsonProperty("trade_species")
-    public String tradeSpecies;
+    public NamedResourceDTO tradeSpecies;
     public TriggerDTO trigger;
     @JsonProperty("turn_upside_down")
-    public boolean turnUpsideDown;
+    public Boolean turnUpsideDown;
 }
 
 // https://pokeapi.co/api/v2/evolution-chain/67/
