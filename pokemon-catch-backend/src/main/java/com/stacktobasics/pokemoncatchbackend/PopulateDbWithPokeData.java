@@ -19,6 +19,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.stacktobasics.pokemoncatchbackend.domain.Game.UNUSED_GAMES;
+
 @Component
 public class PopulateDbWithPokeData {
 
@@ -45,8 +47,10 @@ public class PopulateDbWithPokeData {
     public void populateGames() {
         List<Game> savedGames = new ArrayList<>(gameRepository.findAll());
         GamesDTO games = client.getGames();
-        games.results.stream().filter(newGame -> savedGames.stream().noneMatch(savedGame -> newGame.name.equals(savedGame.getName())))
-                .forEach(game -> gameRepository.save(new Game(game.name)));
+        games.results.stream().filter(newGame -> {
+            if(UNUSED_GAMES.contains(newGame.name)) return false;
+            return savedGames.stream().noneMatch(savedGame -> newGame.name.equals(savedGame.getName()));
+        }).forEach(game -> gameRepository.save(new Game(game.name)));
     }
 
     public void populatePokemon() {

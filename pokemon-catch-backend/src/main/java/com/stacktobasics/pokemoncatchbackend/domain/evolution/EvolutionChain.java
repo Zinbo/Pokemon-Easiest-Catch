@@ -19,8 +19,8 @@ public class EvolutionChain implements AggregateRoot {
     @Id
     private int id;
     private Baby baby;
-    private final List<Evolution> evolutions = new ArrayList<>();
-    private final Set<Integer> allPokemonInChain = new HashSet<>();
+    private List<Evolution> evolutions = new ArrayList<>();
+    private Set<Integer> allPokemonInChain = new HashSet<>();
 
     public EvolutionChain(int id) {
         this.id = id;

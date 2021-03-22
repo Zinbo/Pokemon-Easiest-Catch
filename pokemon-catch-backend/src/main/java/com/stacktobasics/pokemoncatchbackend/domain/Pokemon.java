@@ -7,6 +7,8 @@ import org.springframework.data.annotation.Id;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.stacktobasics.pokemoncatchbackend.domain.Game.UNUSED_GAMES;
+
 @Slf4j
 @Getter
 @Setter
@@ -30,6 +32,7 @@ public class Pokemon implements AggregateRoot {
 
     public void addEncounter(int catchRate, @NonNull String location, @NonNull String gameName,
                              @NonNull String method, @NonNull String condition) {
+         if(UNUSED_GAMES.contains(gameName)) return;
          encounterDetails.addEncounter(catchRate, location, gameName, method, condition);
     }
 }
