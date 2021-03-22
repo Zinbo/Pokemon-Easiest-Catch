@@ -32,15 +32,14 @@ class SelectGamesActivity : AppCompatActivity() {
             ll.addView(chip, lp)
         }
 
-        val gameNames = mutableListOf<String>()
-        Store.user.ownedGames.forEach {
-            gameNames.add(it.name)
-        }
-
         val loadingDialog = LoadingDialog(this)
         val activityIntent = Intent(this, PokemonListActivity::class.java)
         fab.setOnClickListener {
             loadingDialog.showDialog()
+            val gameNames = mutableListOf<String>()
+            Store.user.ownedGames.forEach {
+                gameNames.add(it.name)
+            }
             saveGamesAndNavigateToNextPage(gameNames, loadingDialog, activityIntent)
         }
     }

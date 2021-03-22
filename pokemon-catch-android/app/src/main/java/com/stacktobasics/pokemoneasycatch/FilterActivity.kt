@@ -1,50 +1,37 @@
 package com.stacktobasics.pokemoneasycatch
 
+import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.Switch
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.forEach
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
 import kotlinx.android.synthetic.main.activity_select_games.*
 
 class FilterActivity : AppCompatActivity() {
-
-    private var notSelectedColour: ColorStateList? = null
-    private var selectedColour = ColorStateList.valueOf(Color.RED)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_filter)
 
-        setupGameChips()
+        val spinner = setupSpinner(this)
         setupSwitches()
-        setupResetButton()
+        setupResetButton(spinner)
 
         fab.setOnClickListener {
             startActivity(Intent(this, PokemonListActivity::class.java))
         }
-
     }
 
-    private fun setupResetButton() {
+    private fun setupResetButton(spinner: Spinner) {
         val resetButton = findViewById<Button>(R.id.resetButton)
         resetButton.setOnClickListener {
             // on click, reset filter settings
-            Store.filterOptions.selectedGames = Store.allGames.toMutableList()
-            findViewById<ChipGroup>(R.id.chipGroup).forEach {
-                val chip = it as Chip
-                chip.chipBackgroundColor = selectedColour
-            }
+            Store.filterOptions.selectedGame = null
+            spinner.setSelection(0)
 
             Store.filterOptions.hideOwnedPokemon = false
-            initialiseSwitch(R.id.hideOwned, Store.filterOptions.hideOwnedPokemon)
+            initialiseSwitch(R.id.hideOwnedSwitch, Store.filterOptions.hideOwnedPokemon)
 
             Store.filterOptions.hideUnobtainablePokemon = false
             initialiseSwitch(R.id.hideUnobtainablePokemon, Store.filterOptions.hideUnobtainablePokemon)
@@ -57,7 +44,7 @@ class FilterActivity : AppCompatActivity() {
     }
 
     private fun setupSwitches() {
-        val hideOwnedSwitch = findViewById<View>(R.id.hideOwned) as Switch
+        val hideOwnedSwitch = findViewById<View>(R.id.hideOwnedSwitch) as Switch
         hideOwnedSwitch.isChecked = Store.filterOptions.hideOwnedPokemon
         hideOwnedSwitch.setOnClickListener {
             Store.filterOptions.hideOwnedPokemon = hideOwnedSwitch.isChecked
@@ -70,43 +57,32 @@ class FilterActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupGameChips() {
-        val tempChipForColour = Chip(this)
-        notSelectedColour = tempChipForColour.chipBackgroundColor
-        val chipGroup = findViewById<ChipGroup>(R.id.chipGroup)
-        val lp = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
+    private fun setupSpinner(context: Context) : Spinner {
+        val allGamesPlusExtra = Store.allGames.toMutableList()
+        allGamesPlusExtra.add(0, Game(Companion.ALL_GAMES_SELECTION))
+        val gamesAdapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, allGamesPlusExtra)
+        val spinner = findViewById<Spinner>(R.id.gameToShowSpinner)
+        spinner.adapter = gamesAdapter
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val game = gamesAdapter.getItem(position) as Game
+                if(game.name == ALL_GAMES_SELECTION) Store.filterOptions.selectedGame = null
+                else Store.filterOptions.selectedGame = game
+            }
 
-        Store.allGames.forEach { game ->
-            val chip = Chip(this)
-            if (Store.filterOptions.selectedGames.contains(game)) chip.chipBackgroundColor =
-                selectedColour
-            else chip.chipBackgroundColor = notSelectedColour
-            chip.text = game.name
-            setChipClickListener(chip)
-            chipGroup.addView(chip, lp)
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                Store.filterOptions.selectedGame = null
+            }
         }
+        return spinner
     }
 
-    private fun setChipClickListener(chip: Chip) {
-        chip.setOnClickListener {
-            var foundGame: Game? = null;
-            for (g in Store.allGames) {
-                if (g.name == chip.text) {
-                    foundGame = g
-                }
-            }
-            if (foundGame == null) throw IllegalArgumentException("could not find game " + chip.text)
-
-            if (Store.filterOptions.selectedGames.contains(foundGame)) {
-                Store.filterOptions.selectedGames.remove(foundGame)
-                chip.chipBackgroundColor = notSelectedColour
-            } else {
-                Store.filterOptions.selectedGames.add(foundGame)
-                chip.chipBackgroundColor = selectedColour
-            }
-        }
+    companion object {
+        private const val ALL_GAMES_SELECTION = "All Games"
     }
 }

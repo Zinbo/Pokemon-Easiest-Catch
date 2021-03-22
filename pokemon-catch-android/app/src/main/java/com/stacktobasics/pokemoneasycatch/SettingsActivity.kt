@@ -9,6 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import kotlinx.android.synthetic.main.activity_select_games.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SettingsActivity : AppCompatActivity() {
     private var notSelectedColour: ColorStateList? = null
@@ -20,10 +23,36 @@ class SettingsActivity : AppCompatActivity() {
 
         setupGameChips()
 
+        val loadingDialog = LoadingDialog(this)
         val activityIntent = Intent(this, PokemonListActivity::class.java)
         fab.setOnClickListener {
-            startActivity(activityIntent)
+            val gameNames = mutableListOf<String>()
+            Store.user.ownedGames.forEach {
+                gameNames.add(it.name)
+            }
+            saveGamesAndNavigateToNextPage(gameNames, loadingDialog, activityIntent)
         }
+    }
+
+    private fun saveGamesAndNavigateToNextPage(
+        gameNames: MutableList<String>,
+        loadingDialog: LoadingDialog,
+        activityIntent: Intent) {
+        RestClient.backendAPI.saveGamesForUser(gameNames).enqueue(object : Callback<User> {
+            override fun onResponse(call: Call<User>, response: Response<User>) {
+                if (response.isSuccessful) {
+                    val user = response.body()
+                    if(user != null) Store.user = user
+                    loadingDialog.dismissDialog()
+                    startActivity(activityIntent)
+                }
+            }
+
+            override fun onFailure(call: Call<User>, t: Throwable) {
+                println("Exception when saving owned games: " + t.message)
+                throw t
+            }
+        })
     }
 
     private fun setupGameChips() {

@@ -1,6 +1,7 @@
 package com.stacktobasics.pokemoneasycatch
 
 import io.reactivex.Observable
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -15,7 +16,7 @@ interface BackendAPI {
     fun removePokemon(@Path("userId") userId: String, @Path("pokedexNumber") pokedexNumber: Int) : Call<User>
 
     @GET("users/{userId}")
-    fun getUser(@Path("userId") userId: String) : Observable<User>
+    fun getUser(@Path("userId") userId: String) : Observable<ResponseBody>
 
     @GET("pokemon")
     fun getPokemon() : Observable<List<Pokemon>>

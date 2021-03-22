@@ -1,11 +1,26 @@
 package com.stacktobasics.pokemoneasycatch
 
-data class Game(val name: String)
+data class Game(val name: String) {
+    override fun toString(): String {
+        return name
+    }
+}
 
 data class Pokemon(val pokedexNumber: Int, val name: String, val imageId: String, val officialImage: String,
-    val encounterDetails: EncounterDetails, val evolutionChainId: Int)
+    val encounterDetails: EncounterDetails, val evolutionChainId: Int) {
 
-data class EvolutionChain(val id: Int, val baby: Baby?, val evolutions: List<Evolution>, val allPokemonInChain: List<Int>)
+    override fun equals(other: Any?): Boolean {
+        if(other !is Pokemon) return false
+        return pokedexNumber == other.pokedexNumber
+    }
+}
+
+data class EvolutionChain(val id: Int, val baby: Baby?, val evolutions: List<Evolution>, val allPokemonInChain: List<Int>) {
+    override fun equals(other: Any?): Boolean {
+        if(other !is EvolutionChain) return false
+        return id == other.id
+    }
+}
 
 data class Evolution(val from: Int, val to: Int, val waysToEvolve: List<EvolutionCriteria>)
 
@@ -21,7 +36,12 @@ data class Encounter(val catchRate: Int, val location: Location, val method: Str
 
 data class Location(val name: String, val game: String)
 
-data class User(val id: String, val ownedGames: MutableSet<Game>, val ownedPokemon: MutableSet<Pokemon>)
+data class User(val id: String, val ownedGames: MutableSet<Game>, val ownedPokemon: MutableSet<Pokemon>) {
+    override fun equals(other: Any?): Boolean {
+        if(other !is User) return false
+        return id == other.id
+    }
+}
 
 object Store {
     var allGames: List<Game> = emptyList()
@@ -33,7 +53,7 @@ object Store {
 }
 
 object FilterOptions {
-    var selectedGames: MutableList<Game> = mutableListOf()
+    var selectedGame: Game? = null
     var hideUnobtainablePokemon = false
     var hideOwnedPokemon = false
 }

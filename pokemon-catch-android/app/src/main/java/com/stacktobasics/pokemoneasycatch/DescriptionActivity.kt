@@ -83,8 +83,6 @@ class DescriptionActivity : AppCompatActivity() {
         }
     }
 
-
-
     private fun removeEvolutionSection(parent: ViewGroup) {
         val evolvesFromValue = findViewById<TextView>(R.id.evolvesFromValue)
         val evolvesFromLabel = findViewById<TextView>(R.id.evolvesFromLabel)

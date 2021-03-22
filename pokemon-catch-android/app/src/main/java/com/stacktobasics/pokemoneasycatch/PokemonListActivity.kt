@@ -49,13 +49,13 @@ class PokemonListActivity : AppCompatActivity() {
                 shouldHideBecauseUnobtainable = !pokemonCanBeCaught(pokemon, Store.user.ownedGames)
             }
 
-            val shouldHideBecauseCannotBeCaughtInSelectedGames = !pokemonCanBeCaught(pokemon, Store.filterOptions.selectedGames)
+            val shouldHideBecauseCannotBeCaughtInSelectedGame = !pokemonCanBeCaught(pokemon, Store.filterOptions.selectedGame)
 
             // if the user has selected to hide owned pokemon and hide unobtainable pokemon, then only
             // show pokemon if it is both not owned and can be obtained
             val shouldHide = (Store.filterOptions.hideOwnedPokemon && shouldHideBecauseOwned) ||
                     (Store.filterOptions.hideUnobtainablePokemon && shouldHideBecauseUnobtainable) ||
-                    shouldHideBecauseCannotBeCaughtInSelectedGames
+                    shouldHideBecauseCannotBeCaughtInSelectedGame
 
             if (!shouldHide) pokemonToShow.add(pokemon)
         }
@@ -156,22 +156,23 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
         imageView.id = 100
         imageView.adjustViewBounds = true
         imageView.layoutParams = ViewGroup.LayoutParams(200, 200)
-        val matrix = ColorMatrix()
-        matrix.setSaturation(0f) //0 means grayscale
+        val greyscale = ColorMatrix()
+        greyscale.setSaturation(0f) //0 means greyscale
 
-        if(!pokemonCanBeCaught(pokemon, Store.user.ownedGames)) {
-            val cf = ColorMatrixColorFilter(matrix)
+        val originalSaturation = ColorMatrix()
+
+        if(!Store.user.ownedPokemon.contains(pokemon)) {
+            val cf = ColorMatrixColorFilter(greyscale)
             imageView.colorFilter = cf
         }
 
-        val check = ImageView(context)
-        check.background = context.resources.getDrawable(R.drawable.ic_check_black_24dp)
-        check.id = Random.nextInt()
+        val cross = ImageView(context)
+        cross.background = context.resources.getDrawable(R.drawable.ic_close_black_24dp)
+        cross.id = Random.nextInt()
 
 
         rl.addView(imageView)
-        rl.addView(check)
-        if(!Store.user.ownedPokemon.contains(pokemon)) check.visibility = ImageView.INVISIBLE
+        if(!pokemonCanBeCaught(pokemon, Store.user.ownedGames)) rl.addView(cross)
         c.addView(rl)
 
         val pokemonNameTextView = TextView(context)
@@ -215,7 +216,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
                                         message,
                                         Snackbar.LENGTH_SHORT
                                     ).show()
-                                    check.visibility = ImageView.INVISIBLE
+                                    imageView.colorFilter = ColorMatrixColorFilter(greyscale)
                                 }
                             }
 
@@ -239,7 +240,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
                                         message,
                                         Snackbar.LENGTH_SHORT
                                     ).show()
-                                    check.visibility = ImageView.VISIBLE
+                                    imageView.colorFilter = ColorMatrixColorFilter(originalSaturation)
                                 }
                             }
 
@@ -291,9 +292,18 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
 fun pokemonCanBeCaught(pokemon : Pokemon, games : Collection<Game>) : Boolean {
     // TODO: Need a better way of handling this, need to handle evolutions
     if(games == Store.allGames) return true
-    val ownedGames: List<String> = games.map { game -> game.name }
+    val gameNames: List<String> = games.map { game -> game.name }
     for (encounteredGame in pokemon.encounterDetails.encounters.map { encounter -> encounter.location.game }) {
-        if (ownedGames.contains(encounteredGame)) return true
+        if (gameNames.contains(encounteredGame)) return true
+    }
+    return false
+}
+
+fun pokemonCanBeCaught(pokemon : Pokemon, game : Game?) : Boolean {
+    // TODO: Need a better way of handling this, need to handle evolutions
+    if(game == null) return true
+    for (encounteredGame in pokemon.encounterDetails.encounters.map { encounter -> encounter.location.game }) {
+        if (encounteredGame == game.name) return true
     }
     return false
 }

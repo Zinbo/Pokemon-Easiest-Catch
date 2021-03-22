@@ -2,7 +2,6 @@ package com.stacktobasics.pokemoneasycatch
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.RequestQueue
@@ -22,26 +21,13 @@ class StartingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_starting_screen)
-
-        val pb : ProgressBar = findViewById(R.id.progressBar)
         val selectGamesIntent = Intent(this, SelectGamesActivity::class.java)
         val pokemonListIntent = Intent(this, PokemonListActivity::class.java)
-        /*val queue = HttpClient.getInstance(this.applicationContext).requestQueue
 
-        var noOfRequestsCompleted = 0
-        getGames(queue)
-        getPokemon(queue)
-        queue.addRequestFinishedListener<Any> {
-            noOfRequestsCompleted++
-            if(noOfRequestsCompleted == 2) {
-                pb.visibility = ProgressBar.VISIBLE
-                startActivity(activityIntent)
-            }
-        }*/
         val getData = Observable.merge(RestClient.backendAPI.getGames()
             .doOnNext { games ->
                 Store.allGames = games
-                Store.filterOptions.selectedGames = games.toMutableList()
+                Store.filterOptions.selectedGame = null
             },
             RestClient.backendAPI.getPokemon()
                 .doOnNext { pokemon -> Store.allPokemon = pokemon },
@@ -49,7 +35,8 @@ class StartingActivity : AppCompatActivity() {
                 .doOnNext { chains -> Store.allEvolutionChains = chains },
             RestClient.backendAPI.getUser("1")
                 .doOnNext { user ->
-                    Store.user = user ?: User("1", mutableSetOf(), mutableSetOf())
+                    val fromJson = Gson().fromJson(user.charStream(), User::class.java)
+                    Store.user = fromJson ?: User("1", mutableSetOf(), mutableSetOf())
                 })
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -85,7 +72,7 @@ class StartingActivity : AppCompatActivity() {
                 Store.allGames = Gson().fromJson(response.toString(), type)
 
                 // TODO: need to get list of filtered games from back end when saved for user
-                Store.filterOptions.selectedGames = Gson().fromJson(response.toString(), type)
+                Store.filterOptions.selectedGame = Gson().fromJson(response.toString(), type)
             },
             Response.ErrorListener { error ->
                 println("Game request failed")
