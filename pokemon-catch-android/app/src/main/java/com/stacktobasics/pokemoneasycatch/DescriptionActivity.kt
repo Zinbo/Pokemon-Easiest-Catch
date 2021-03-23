@@ -9,7 +9,9 @@ import android.widget.TableRow
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_description.*
 
 class DescriptionActivity : AppCompatActivity() {
 
@@ -31,8 +33,47 @@ class DescriptionActivity : AppCompatActivity() {
 
         drawEncountersTable(pokemon, context)
         drawEvolutionSection(pokemon, (pokemonName.parent as ViewGroup), context)
+        drawHatchingSection(pokemon, (pokemonName.parent as ViewGroup), context)
         imageLayout.addView(imageView)
+    }
 
+    private fun drawHatchingSection(pokemon: Pokemon, parent: ViewGroup, context: Context) {
+        val evolutionChain = Store.allEvolutionChains.find { e -> e.id == pokemon.evolutionChainId }
+            ?: throw RuntimeException("pokemon ${pokemon.name} has chain id which does not exist: ${pokemon.evolutionChainId}")
+        val isNotBaby =
+            evolutionChain.baby == null || evolutionChain.baby.pokedexNumber != pokemon.pokedexNumber
+        if(isNotBaby) removeHatchingSection(parent)
+        else populateHatchingSection(evolutionChain.baby?.item ?: "")
+    }
+
+    private fun populateHatchingSection(item: String) {
+        val requiresItemValue = findViewById<TextView>(R.id.requiresItemValue)
+        requiresItemValue.text = item
+    }
+
+    private fun removeHatchingSection(parent: ViewGroup) {
+        val hatchingCriteriaLabel = findViewById<TextView>(R.id.hatchingCriteriaLabel)
+        val requiresItemLabel = findViewById<TextView>(R.id.requiresItemLabel)
+        val requiresItemValue = findViewById<TextView>(R.id.requiresItemValue)
+
+        parent.removeView(hatchingCriteriaLabel)
+        parent.removeView(requiresItemLabel)
+        parent.removeView(requiresItemValue)
+
+        moveEvolutionSectionUpIfExists()
+    }
+
+    private fun moveEvolutionSectionUpIfExists() {
+        val evolutionCriteria = findViewById<TextView>(R.id.evolutionCriteria) ?: return
+        val encountersTable = findViewById<TableLayout>(R.id.encountersTable)
+        val set = ConstraintSet()
+        val mConstraintLayout = findViewById<ConstraintLayout>(R.id.constraintLayout);
+        set.clone(mConstraintLayout)
+        set.connect(
+            evolutionCriteria.id, ConstraintSet.TOP,
+            encountersTable.id, ConstraintSet.BOTTOM, 16
+        )
+        set.applyTo(constraintLayout)
     }
 
     private fun drawEvolutionSection(pokemon: Pokemon, parent: ViewGroup, context: Context) {

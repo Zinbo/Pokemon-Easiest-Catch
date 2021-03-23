@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".DescriptionActivity">
@@ -25,12 +26,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pokemonName">
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </ScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/encounters"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Encounters"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -92,14 +103,45 @@
     </TableLayout>
 
     <TextView
-        android:id="@+id/evolutionCriteria"
+        android:id="@+id/hatchingCriteriaLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Evolution Criteria"
+        android:layout_marginTop="16dp"
+        android:text="Hatching Criteria"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/encountersTable" />
+
+    <TextView
+        android:id="@+id/requiresItemLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Requires Item:"
+        app:layout_constraintEnd_toStartOf="@+id/requiresItemValue"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/hatchingCriteriaLabel" />
+
+    <TextView
+        android:id="@+id/requiresItemValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/requiresItemLabel"
+        app:layout_constraintTop_toBottomOf="@+id/hatchingCriteriaLabel" />
+
+    <TextView
+        android:id="@+id/evolutionCriteria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Evolution Criteria"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/requiresItemValue" />
 
     <TextView
         android:id="@+id/evolvesFromValue"
