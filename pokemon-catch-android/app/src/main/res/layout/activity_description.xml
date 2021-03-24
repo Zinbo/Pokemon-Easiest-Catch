@@ -46,6 +46,11 @@
             android:id="@+id/encounterTableHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -94,15 +99,19 @@
         </LinearLayout>
 
         <com.stacktobasics.pokemoneasycatch.MaxHeightRecyclerView
-            android:id="@+id/rvContacts"
+            android:id="@+id/encountersTable"
             android:layout_width="match_parent"
             android:layout_height="400dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:paddingBottom="8dp"
             android:scrollbars="vertical"
-            app:maxHeight="200dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/encounterTableHeader" />
+            app:layout_constraintTop_toBottomOf="@+id/encounterTableHeader"
+            app:maxHeight="200dp" />
 
         <TextView
             android:id="@+id/hatchingCriteriaLabel"
@@ -113,12 +122,13 @@
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rvContacts" />
+            app:layout_constraintTop_toBottomOf="@+id/encountersTable" />
 
         <TextView
             android:id="@+id/requiresItemLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="Requires Item:"
             app:layout_constraintEnd_toStartOf="@+id/requiresItemValue"
             app:layout_constraintHorizontal_bias="0.5"
@@ -129,6 +139,7 @@
             android:id="@+id/requiresItemValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/requiresItemLabel"
@@ -149,6 +160,7 @@
             android:id="@+id/evolvesFromValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/evolvesFromLabel"
@@ -158,49 +170,59 @@
             android:id="@+id/evolvesFromLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="Evolves from:"
             app:layout_constraintEnd_toStartOf="@+id/evolvesFromValue"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/evolutionCriteria" />
 
-        <ScrollView
-            android:id="@+id/evolutionsScrollView"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/evolutionCriteriaTableHeader"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/evolvesFromLabel">
 
-            <TableLayout
-                android:id="@+id/evolutionTable"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/triggerHeader"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:stretchColumns="*">
+                android:layout_weight="0.5"
+                android:text="Trigger"
+                android:textStyle="bold" />
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/evolutionCriteriaHeader"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Evolution Criteria"
+                android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/textView7"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Trigger" />
+        </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/textView10"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Criteria" />
-                </TableRow>
-
-            </TableLayout>
-        </ScrollView>
+        <com.stacktobasics.pokemoneasycatch.MaxHeightRecyclerView
+            android:id="@+id/evolutionTable"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:paddingBottom="8dp"
+            android:scrollbars="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/evolutionCriteriaTableHeader"
+            app:maxHeight="200dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
