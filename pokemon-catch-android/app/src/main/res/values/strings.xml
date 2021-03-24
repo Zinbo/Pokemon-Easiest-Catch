@@ -9,6 +9,7 @@
     <string name="sort">Sort</string>
     <string name="name">Name</string>
     <string name="location">Location</string>
+    <string name="catchRate">catchRate</string>
     <string name="filter">filter</string>
     <string name="title_activity_settings">SettingsActivity</string>
     <!-- Strings used for fragments for navigation -->

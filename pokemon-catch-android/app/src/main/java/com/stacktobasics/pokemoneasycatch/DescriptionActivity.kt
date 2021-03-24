@@ -3,13 +3,12 @@ package com.stacktobasics.pokemoneasycatch
 import android.content.Context
 import android.os.Bundle
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TableLayout
-import android.widget.TableRow
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_description.*
 
@@ -65,13 +64,13 @@ class DescriptionActivity : AppCompatActivity() {
 
     private fun moveEvolutionSectionUpIfExists() {
         val evolutionCriteria = findViewById<TextView>(R.id.evolutionCriteria) ?: return
-        val encountersTable = findViewById<TableLayout>(R.id.encountersTable)
+        val encountersScrollView = findViewById<RecyclerView>(R.id.rvContacts)
         val set = ConstraintSet()
         val mConstraintLayout = findViewById<ConstraintLayout>(R.id.constraintLayout);
         set.clone(mConstraintLayout)
         set.connect(
             evolutionCriteria.id, ConstraintSet.TOP,
-            encountersTable.id, ConstraintSet.BOTTOM, 16
+            encountersScrollView.id, ConstraintSet.BOTTOM, 16
         )
         set.applyTo(constraintLayout)
     }
@@ -127,12 +126,12 @@ class DescriptionActivity : AppCompatActivity() {
     private fun removeEvolutionSection(parent: ViewGroup) {
         val evolvesFromValue = findViewById<TextView>(R.id.evolvesFromValue)
         val evolvesFromLabel = findViewById<TextView>(R.id.evolvesFromLabel)
-        val evolutionTable = findViewById<TableLayout>(R.id.evolutionTable)
+        val evolutionScrollView = findViewById<ScrollView>(R.id.evolutionsScrollView)
         val evolutionCriteriaLabel = findViewById<TextView>(R.id.evolutionCriteria)
 
         parent.removeView(evolvesFromValue)
         parent.removeView(evolvesFromLabel)
-        parent.removeView(evolutionTable)
+        parent.removeView(evolutionScrollView)
         parent.removeView(evolutionCriteriaLabel)
     }
 
@@ -140,35 +139,12 @@ class DescriptionActivity : AppCompatActivity() {
         pokemon: Pokemon,
         context: Context
     ) {
-        val table = findViewById<TableLayout>(R.id.encountersTable)
         val encountersSortedByCatchRate =
             pokemon.encounterDetails.encounters.sortedByDescending { encounter -> encounter.catchRate }
-        for (encounter in encountersSortedByCatchRate) {
-            if (!Store.user.ownedGames.contains(Game(encounter.location.game))) continue;
 
-            val tableRow = TableRow(context)
-
-            val gameTextView = TextView(context)
-            gameTextView.text = encounter.location.game
-            tableRow.addView(gameTextView)
-
-            val catchRateTextView = TextView(context)
-            catchRateTextView.text = encounter.catchRate.toString()
-            tableRow.addView(catchRateTextView)
-
-            val locationTextView = TextView(context)
-            locationTextView.text = encounter.location.name
-            tableRow.addView(locationTextView)
-
-            val conditionTextView = TextView(context)
-            conditionTextView.text = encounter.condition
-            tableRow.addView(conditionTextView)
-
-            val methodTextView = TextView(context)
-            methodTextView.text = encounter.method
-            tableRow.addView(methodTextView)
-
-            table.addView(tableRow)
-        }
+        val rvContacts = findViewById<RecyclerView>(R.id.rvContacts)
+        val adapter = EncountersAdapter(encountersSortedByCatchRate)
+        rvContacts.adapter = adapter
+        rvContacts.layoutManager = LinearLayoutManager(this)
     }
 }
