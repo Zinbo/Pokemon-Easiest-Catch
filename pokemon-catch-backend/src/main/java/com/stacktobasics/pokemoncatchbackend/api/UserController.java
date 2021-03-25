@@ -26,7 +26,7 @@ public class UserController {
         if(userRepository.findAll().isEmpty()) userRepository.save(new User());
 
         User user = userRepository.findAll().get(0);
-        user.addGames(games, gameRepository);
+        user.replaceGames(games, gameRepository);
         userRepository.save(user);
         return ResponseEntity.ok(user);
     }

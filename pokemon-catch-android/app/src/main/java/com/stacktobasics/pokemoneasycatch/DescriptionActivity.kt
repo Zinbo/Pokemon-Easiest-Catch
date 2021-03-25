@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -116,11 +117,13 @@ class DescriptionActivity : AppCompatActivity() {
         val evolvesFromLabel = findViewById<TextView>(R.id.evolvesFromLabel)
         val evolutionScrollView = findViewById<RecyclerView>(R.id.evolutionTable)
         val evolutionCriteriaLabel = findViewById<TextView>(R.id.evolutionCriteria)
+        val evolutionTableHeader = findViewById<LinearLayout>(R.id.evolutionCriteriaTableHeader)
 
         parent.removeView(evolvesFromValue)
         parent.removeView(evolvesFromLabel)
         parent.removeView(evolutionScrollView)
         parent.removeView(evolutionCriteriaLabel)
+        parent.removeView(evolutionTableHeader)
     }
 
     private fun drawEncountersTable(
@@ -128,7 +131,12 @@ class DescriptionActivity : AppCompatActivity() {
         context: Context
     ) {
         val encountersSortedByCatchRate =
-            pokemon.encounterDetails.encounters.sortedByDescending { encounter -> encounter.catchRate }
+            pokemon.encounterDetails.encounters.sortedByDescending { encounter -> encounter.catchRate }.toMutableList()
+        var iterator = encountersSortedByCatchRate.iterator()
+        while(iterator.hasNext()) {
+            val encounter = iterator.next()
+            if(Store.user.ownedGames.find { it.name == encounter.location.game } == null) iterator.remove()
+        }
 
         val rvContacts = findViewById<RecyclerView>(R.id.encountersTable)
         val adapter = EncountersAdapter(encountersSortedByCatchRate)

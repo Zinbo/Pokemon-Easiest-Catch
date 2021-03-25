@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Getter
@@ -25,12 +26,12 @@ public class User {
                 () -> log.warn("trying to add game \"{}\" that does not exist", gameName));
     }
 
-    public void addGames(@NonNull List<String> gameNames, @NonNull GameRepository gameRepository) {
+    public void replaceGames(@NonNull List<String> gameNames, @NonNull GameRepository gameRepository) {
         List<Game> savedGames = gameRepository.findAll();
-        gameNames.stream().flatMap(gameName -> {
+        ownedGames = gameNames.stream().flatMap(gameName -> {
             Optional<Game> matchedGame = savedGames.stream().filter(savedGame -> savedGame.name.equals(gameName)).findFirst();
             return matchedGame.stream();
-        }).forEach(ownedGames::add);
+        }).collect(Collectors.toSet());
     }
 
     public void addPokemon(@NonNull Integer pokedexNumber, @NonNull PokemonRepository pokemonRepository) {
