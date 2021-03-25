@@ -8,7 +8,10 @@ import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.*
+import android.widget.BaseAdapter
+import android.widget.GridView
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -146,8 +149,6 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
         val c = ConstraintLayout(context)
 
-        val rl = RelativeLayout(context)
-        rl.id = Random.nextInt()
         val imageView = ImageView(context)
         val pokemon = pokemon[position]
         Picasso.get().load(pokemon.imageId).into(imageView)
@@ -167,26 +168,32 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
             val cf = ColorMatrixColorFilter(greyscale)
             imageView.colorFilter = cf
         }
-        rl.addView(imageView)
+        c.addView(imageView)
 
         // calculate whether can be caught
         val canBeCaughtImage = ImageView(context)
         canBeCaughtImage.background = context.resources.getDrawable(R.drawable.ic_add_circle_black_24dp)
         canBeCaughtImage.id = Random.nextInt()
-        if(!ownsPokemon && canBeCaught) rl.addView(canBeCaughtImage)
+        canBeCaughtImage.alpha = 0.5f
+        val showCanBeCaughtImage = !ownsPokemon && canBeCaught
+        if(showCanBeCaughtImage) c.addView(canBeCaughtImage)
 
         // Calculate whether to show egg
         val canBeBred = pokemonCanBeBred(pokemon)
         val egg = ImageView(context)
         egg.background = context.resources.getDrawable(R.drawable.ic_adb_black_24dp)
         egg.id = Random.nextInt()
-        if(!ownsPokemon && canBeBred) rl.addView(egg)
+        egg.alpha = 0.5f
+        val showEggImage = !ownsPokemon && canBeBred
+        if(showEggImage) c.addView(egg)
 
         // calculate whether other pokemon can be caught and then this bred
         val canBeBredIfOtherPokemonCaughtImage = ImageView(context)
         canBeBredIfOtherPokemonCaughtImage.background = context.resources.getDrawable(R.drawable.ic_arrow_forward_black_24dp)
         canBeBredIfOtherPokemonCaughtImage.id = Random.nextInt()
-        if(!ownsPokemon && !canBeBred && !canBeCaught && canBeBredIfOtherPokemonCaught(pokemon)) rl.addView(canBeBredIfOtherPokemonCaughtImage)
+        canBeBredIfOtherPokemonCaughtImage.alpha = 0.5f
+        val showCaughtAndBredImage = !ownsPokemon && !canBeBred && canBeBredIfOtherPokemonCaught(pokemon)
+        if(showCaughtAndBredImage) c.addView(canBeBredIfOtherPokemonCaughtImage)
 
         // can't be caught
 /*        val cross = ImageView(context)
@@ -194,13 +201,29 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
         cross.id = Random.nextInt()
         if(!ownsPokemon && !canBeCaught && !canBeBred) rl.addView(cross)*/
 
-        c.addView(rl)
-
         val pokemonNameTextView = TextView(context)
         pokemonNameTextView.text = pokemon.name
         pokemonNameTextView.id = 150
         c.addView(pokemonNameTextView)
         set.clone(c)
+
+        if(showCanBeCaughtImage) set.connect(canBeCaughtImage.id, ConstraintSet.START,
+            ConstraintSet.PARENT_ID, ConstraintSet.START, 8)
+        if(showEggImage) set.connect(egg.id, ConstraintSet.END,
+            ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
+        if(showCaughtAndBredImage) {
+            set.connect(canBeBredIfOtherPokemonCaughtImage.id, ConstraintSet.START,
+                ConstraintSet.START, ConstraintSet.END, 8)
+            set.connect(canBeBredIfOtherPokemonCaughtImage.id, ConstraintSet.BOTTOM,
+                imageView.id, ConstraintSet.BOTTOM, 0)
+        }
+
+            if(showEggImage && showCanBeCaughtImage) {
+//            set.connect(egg.id, ConstraintSet.START,
+//                canBeCaughtImage.id, ConstraintSet.END, 0)
+
+
+            }
 
         set.connect(pokemonNameTextView.getId(), ConstraintSet.LEFT,
             ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0)
@@ -209,13 +232,13 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
         set.connect(pokemonNameTextView.getId(), ConstraintSet.BOTTOM,
             ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0)
 
-        set.connect(rl.getId(), ConstraintSet.TOP,
+        set.connect(imageView.id, ConstraintSet.TOP,
             ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0)
-        set.connect(rl.getId(), ConstraintSet.LEFT,
+        set.connect(imageView.id, ConstraintSet.LEFT,
             ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0)
-        set.connect(rl.getId(), ConstraintSet.RIGHT,
+        set.connect(imageView.id, ConstraintSet.RIGHT,
             ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, 0)
-        set.connect(rl.id, ConstraintSet.BOTTOM,
+        set.connect(imageView.id, ConstraintSet.BOTTOM,
             pokemonNameTextView.getId(), ConstraintSet.TOP)
 
         val value = object : View.OnTouchListener {
@@ -314,7 +337,10 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
     private fun canBeBredIfOtherPokemonCaught(pokemon: Pokemon): Boolean {
         val evolutionChain =
             Store.allEvolutionChains.find { pokemon.evolutionChainId == it.id } ?: return false
-        evolutionChain.allPokemonInChain.find { pId ->
+
+        val allPokemonInChain = evolutionChain.allPokemonInChain.toMutableList()
+        allPokemonInChain.remove(pokemon.pokedexNumber)
+        allPokemonInChain.find { pId ->
             val foundPokemon = Store.allPokemon.find { p -> p.pokedexNumber == pId } ?: return false
             pokemonCanBeCaught(foundPokemon, Store.user.ownedGames) } ?: return false
         return true
