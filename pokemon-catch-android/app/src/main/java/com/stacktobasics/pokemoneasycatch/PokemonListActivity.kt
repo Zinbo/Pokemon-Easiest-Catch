@@ -172,7 +172,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
 
         // calculate whether can be caught
         val canBeCaughtImage = ImageView(context)
-        canBeCaughtImage.background = context.resources.getDrawable(R.drawable.ic_add_circle_black_24dp)
+        canBeCaughtImage.background = context.resources.getDrawable(R.drawable.ic_pokeball)
         canBeCaughtImage.id = Random.nextInt()
         canBeCaughtImage.alpha = 0.5f
         val showCanBeCaughtImage = !ownsPokemon && canBeCaught
@@ -181,7 +181,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
         // Calculate whether to show egg
         val canBeBred = pokemonCanBeBred(pokemon)
         val egg = ImageView(context)
-        egg.background = context.resources.getDrawable(R.drawable.ic_adb_black_24dp)
+        egg.background = context.resources.getDrawable(R.drawable.ic_egg)
         egg.id = Random.nextInt()
         egg.alpha = 0.5f
         val showEggImage = !ownsPokemon && canBeBred
@@ -189,7 +189,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
 
         // calculate whether other pokemon can be caught and then this bred
         val canBeBredIfOtherPokemonCaughtImage = ImageView(context)
-        canBeBredIfOtherPokemonCaughtImage.background = context.resources.getDrawable(R.drawable.ic_arrow_forward_black_24dp)
+        canBeBredIfOtherPokemonCaughtImage.background = context.resources.getDrawable(R.drawable.ic_pokeball_egg)
         canBeBredIfOtherPokemonCaughtImage.id = Random.nextInt()
         canBeBredIfOtherPokemonCaughtImage.alpha = 0.5f
         val showCaughtAndBredImage = !ownsPokemon && !canBeBred && canBeBredIfOtherPokemonCaught(pokemon)
@@ -213,7 +213,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
             ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
         if(showCaughtAndBredImage) {
             set.connect(canBeBredIfOtherPokemonCaughtImage.id, ConstraintSet.START,
-                ConstraintSet.START, ConstraintSet.END, 8)
+                ConstraintSet.PARENT_ID, ConstraintSet.START, 8)
             set.connect(canBeBredIfOtherPokemonCaughtImage.id, ConstraintSet.BOTTOM,
                 imageView.id, ConstraintSet.BOTTOM, 0)
         }
