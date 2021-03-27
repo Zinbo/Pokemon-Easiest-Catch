@@ -20,6 +20,7 @@ import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.math.max
 import kotlin.random.Random
 
 
@@ -49,7 +50,7 @@ class PokemonListActivity : AppCompatActivity() {
 
             var shouldHideBecauseUnobtainable = false
             if (Store.filterOptions.hideUnobtainablePokemon) {
-                shouldHideBecauseUnobtainable = !pokemonCanBeCaught(pokemon, Store.user.ownedGames)
+                shouldHideBecauseUnobtainable = !pokemonCanBeObtained(pokemon)
             }
 
             val shouldHideBecauseCannotBeCaughtInSelectedGame = !pokemonCanBeCaught(pokemon, Store.filterOptions.selectedGame)
@@ -174,7 +175,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
         val canBeCaughtImage = ImageView(context)
         canBeCaughtImage.background = context.resources.getDrawable(R.drawable.ic_pokeball)
         canBeCaughtImage.id = Random.nextInt()
-        canBeCaughtImage.alpha = 0.5f
+//        canBeCaughtImage.alpha = 0.5f
         val showCanBeCaughtImage = !ownsPokemon && canBeCaught
         if(showCanBeCaughtImage) c.addView(canBeCaughtImage)
 
@@ -183,7 +184,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
         val egg = ImageView(context)
         egg.background = context.resources.getDrawable(R.drawable.ic_egg)
         egg.id = Random.nextInt()
-        egg.alpha = 0.5f
+//        egg.alpha = 0.5f
         val showEggImage = !ownsPokemon && canBeBred
         if(showEggImage) c.addView(egg)
 
@@ -191,7 +192,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
         val canBeBredIfOtherPokemonCaughtImage = ImageView(context)
         canBeBredIfOtherPokemonCaughtImage.background = context.resources.getDrawable(R.drawable.ic_pokeball_egg)
         canBeBredIfOtherPokemonCaughtImage.id = Random.nextInt()
-        canBeBredIfOtherPokemonCaughtImage.alpha = 0.5f
+//        canBeBredIfOtherPokemonCaughtImage.alpha = 0.5f
         val showCaughtAndBredImage = !ownsPokemon && !canBeBred && canBeBredIfOtherPokemonCaught(pokemon)
         if(showCaughtAndBredImage) c.addView(canBeBredIfOtherPokemonCaughtImage)
 
@@ -200,6 +201,12 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
         cross.background = context.resources.getDrawable(R.drawable.ic_close_black_24dp)
         cross.id = Random.nextInt()
         if(!ownsPokemon && !canBeCaught && !canBeBred) rl.addView(cross)*/
+
+        val hasBestCatchRate = !ownsPokemon && pokemonHasBestCatchRateInSelectedGameOutOfOwnedGames(pokemon);
+        val star = ImageView(context)
+        star.background = context.resources.getDrawable(R.drawable.ic_star)
+        star.id = Random.nextInt()
+        if(hasBestCatchRate) c.addView(star)
 
         val pokemonNameTextView = TextView(context)
         pokemonNameTextView.text = pokemon.name
@@ -217,13 +224,11 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
             set.connect(canBeBredIfOtherPokemonCaughtImage.id, ConstraintSet.BOTTOM,
                 imageView.id, ConstraintSet.BOTTOM, 0)
         }
+        if(hasBestCatchRate) {
+            set.connect(star.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
+            set.connect(star.id, ConstraintSet.BOTTOM, imageView.id, ConstraintSet.BOTTOM, 8)
+        }
 
-            if(showEggImage && showCanBeCaughtImage) {
-//            set.connect(egg.id, ConstraintSet.START,
-//                canBeCaughtImage.id, ConstraintSet.END, 0)
-
-
-            }
 
         set.connect(pokemonNameTextView.getId(), ConstraintSet.LEFT,
             ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0)
@@ -333,32 +338,38 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
         set.applyTo(c)
         return c
     }
+}
 
-    private fun canBeBredIfOtherPokemonCaught(pokemon: Pokemon): Boolean {
-        val evolutionChain =
-            Store.allEvolutionChains.find { pokemon.evolutionChainId == it.id } ?: return false
+private fun canBeBredIfOtherPokemonCaught(pokemon: Pokemon): Boolean {
+    val evolutionChain =
+        Store.allEvolutionChains.find { pokemon.evolutionChainId == it.id } ?: return false
 
-        val allPokemonInChain = evolutionChain.allPokemonInChain.toMutableList()
-        allPokemonInChain.remove(pokemon.pokedexNumber)
-        allPokemonInChain.find { pId ->
-            val foundPokemon = Store.allPokemon.find { p -> p.pokedexNumber == pId } ?: return false
-            pokemonCanBeCaught(foundPokemon, Store.user.ownedGames) } ?: return false
-        return true
+    val allPokemonInChain = evolutionChain.allPokemonInChain.toMutableList()
+    allPokemonInChain.remove(pokemon.pokedexNumber)
+    allPokemonInChain.find { pId ->
+        val foundPokemon = Store.allPokemon.find { p -> p.pokedexNumber == pId } ?: return false
+        pokemonCanBeCaught(foundPokemon, Store.user.ownedGames) } ?: return false
+    return true
+}
+
+fun pokemonCanBeBred(pokemon: Pokemon): Boolean {
+    // get evolution chain for pokemon
+    // if any of the pokemon in that chain exist in owned pokemon, then show egg
+    val ownedPokemonIds = Store.user.ownedPokemon.map { p -> p.pokedexNumber }
+
+    val evolutionChain =
+        Store.allEvolutionChains.find { pokemon.evolutionChainId == it.id } ?: return false
+
+    for (pokedexId in evolutionChain.allPokemonInChain) {
+        if(ownedPokemonIds.contains(pokedexId)) return true
     }
+    return false
+}
 
-    private fun pokemonCanBeBred(pokemon: Pokemon): Boolean {
-        // get evolution chain for pokemon
-        // if any of the pokemon in that chain exist in owned pokemon, then show egg
-        val ownedPokemonIds = Store.user.ownedPokemon.map { p -> p.pokedexNumber }
-
-        val evolutionChain =
-            Store.allEvolutionChains.find { pokemon.evolutionChainId == it.id } ?: return false
-
-        for (pokedexId in evolutionChain.allPokemonInChain) {
-            if(ownedPokemonIds.contains(pokedexId)) return true
-        }
-        return false
-    }
+fun pokemonCanBeObtained(pokemon : Pokemon) : Boolean {
+    return pokemonCanBeCaught(pokemon, Store.user.ownedGames) ||
+            pokemonCanBeBred(pokemon) ||
+            canBeBredIfOtherPokemonCaught(pokemon)
 }
 
 fun pokemonCanBeCaught(pokemon : Pokemon, games : Collection<Game>) : Boolean {
@@ -368,6 +379,26 @@ fun pokemonCanBeCaught(pokemon : Pokemon, games : Collection<Game>) : Boolean {
         if (gameNames.contains(encounteredGame)) return true
     }
     return false
+}
+
+fun pokemonHasBestCatchRateInSelectedGameOutOfOwnedGames(pokemon: Pokemon) : Boolean {
+    val selectedGame = Store.filterOptions.selectedGame
+    if(selectedGame !is Game) return false
+    if(!Store.user.ownedGames.contains(selectedGame)) return false
+
+    var bestCatchRateForSelectedGame = -1
+    for (encounter in pokemon.encounterDetails.encounters) {
+        if(selectedGame.name != encounter.location.game) continue
+        bestCatchRateForSelectedGame = max(bestCatchRateForSelectedGame, encounter.catchRate)
+    }
+    if(bestCatchRateForSelectedGame == -1) return false
+
+    val ownedGamesNames = Store.user.ownedGames.map { g -> g.name }
+    for (encounter in pokemon.encounterDetails.encounters) {
+        if(!ownedGamesNames.contains(encounter.location.game)) continue
+        if(encounter.catchRate > bestCatchRateForSelectedGame) return false
+    }
+    return true
 }
 
 fun pokemonCanBeCaught(pokemon : Pokemon, game : Game?) : Boolean {

@@ -10,6 +10,8 @@ import kotlinx.android.synthetic.main.activity_select_games.*
 
 class FilterActivity : AppCompatActivity() {
 
+    var firstTimeLoad = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_filter)
@@ -59,10 +61,14 @@ class FilterActivity : AppCompatActivity() {
 
     private fun setupSpinner(context: Context) : Spinner {
         val allGamesPlusExtra = Store.allGames.toMutableList()
-        allGamesPlusExtra.add(0, Game(Companion.ALL_GAMES_SELECTION))
+        allGamesPlusExtra.add(0, Game(ALL_GAMES_SELECTION))
         val gamesAdapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, allGamesPlusExtra)
         val spinner = findViewById<Spinner>(R.id.gameToShowSpinner)
+        val selectedGame = Store.filterOptions.selectedGame
         spinner.adapter = gamesAdapter
+        if(selectedGame is Game) {
+            spinner.setSelection(Store.allGames.indexOf(selectedGame)+1)
+        }
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -70,6 +76,10 @@ class FilterActivity : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
+                if(firstTimeLoad) {
+                    firstTimeLoad = false
+                    return
+                }
                 val game = gamesAdapter.getItem(position) as Game
                 if(game.name == ALL_GAMES_SELECTION) Store.filterOptions.selectedGame = null
                 else Store.filterOptions.selectedGame = game
