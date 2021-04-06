@@ -4,9 +4,6 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.stacktobasics.pokemoncatchbackend.domain.Game.UNUSED_GAMES;
 
 @Slf4j
@@ -18,16 +15,14 @@ public class Pokemon implements AggregateRoot {
     @Id
     private Integer pokedexNumber;
     private String name;
-    private String imageId;
-    private String officialImage;
+    private @NonNull int generation;
     private EncounterDetails encounterDetails = new EncounterDetails();
     private int evolutionChainId;
 
-    public Pokemon(@NonNull Integer pokedexNumber, @NonNull String name, @NonNull String imageId, @NonNull String officialImage) {
+    public Pokemon(@NonNull Integer pokedexNumber, @NonNull String name, @NonNull int generation) {
         this.pokedexNumber = pokedexNumber;
         this.name = name;
-        this.imageId = imageId;
-        this.officialImage = officialImage;
+        this.generation = generation;
     }
 
     public void addEncounter(int catchRate, @NonNull String location, @NonNull String gameName,

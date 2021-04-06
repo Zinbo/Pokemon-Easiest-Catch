@@ -2,6 +2,7 @@ package com.stacktobasics.pokemoncatchbackend.infra;
 
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.EncounterDTO;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.GamesDTO;
+import com.stacktobasics.pokemoncatchbackend.infra.dtos.GenerationDTO;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.PokemonDTO;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.evolution.PokemonEvolutionDTO;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ public class PokeApiClient {
     public static final String POKEAPI_BASE_URL = "https://pokeapi.co/api/v2/";
     private final RestTemplate restTemplate;
     private final boolean shouldGetAllPokemon;
+    public static final int LAST_GENERATION = 8;
 
     public PokeApiClient(@Value("${feature-toggle.should-get-all-pokemon}") boolean shouldGetAllPokemon) {
         this.restTemplate = new RestTemplate();
@@ -31,8 +33,19 @@ public class PokeApiClient {
     }
 
     public List<PokemonDTO> getPokemon() {
-        if(shouldGetAllPokemon) return getAllPokemon();
+        if (shouldGetAllPokemon) return getAllPokemon();
         return getFirst50Pokemon();
+    }
+
+    public List<GenerationDTO> getGenerations() {
+        List<GenerationDTO> generations = new ArrayList<>();
+        for (int i = 1; i <= LAST_GENERATION; i++) {
+            String url = String.format("%s/generation/%s", POKEAPI_BASE_URL, i);
+            generations.add(restTemplate.getForObject(
+                    url,
+                    GenerationDTO.class));
+        }
+        return generations;
     }
 
     private List<PokemonDTO> getFirst50Pokemon() {

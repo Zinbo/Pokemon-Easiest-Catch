@@ -1,6 +1,9 @@
 package com.stacktobasics.pokemoncatchbackend;
 
-import com.stacktobasics.pokemoncatchbackend.domain.*;
+import com.stacktobasics.pokemoncatchbackend.domain.Game;
+import com.stacktobasics.pokemoncatchbackend.domain.GameRepository;
+import com.stacktobasics.pokemoncatchbackend.domain.Pokemon;
+import com.stacktobasics.pokemoncatchbackend.domain.PokemonRepository;
 import com.stacktobasics.pokemoncatchbackend.domain.evolution.EvolutionChain;
 import com.stacktobasics.pokemoncatchbackend.domain.evolution.EvolutionChainRepository;
 import com.stacktobasics.pokemoncatchbackend.infra.PokeApiClient;
@@ -14,6 +17,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,9 +57,19 @@ public class PopulateDbWithPokeData {
         List<Game> savedGames = new ArrayList<>(gameRepository.findAll());
         GamesDTO games = client.getGames();
         games.results.stream().filter(newGame -> {
-            if(UNUSED_GAMES.contains(newGame.name)) return false;
+            if (UNUSED_GAMES.contains(newGame.name)) return false;
             return savedGames.stream().noneMatch(savedGame -> newGame.name.equals(savedGame.getName()));
         }).forEach(game -> gameRepository.save(new Game(game.name)));
+    }
+
+    private void downloadAndSaveImage(int id, String descriptionImage, String folder) {
+        try (InputStream in = new URL(descriptionImage).openStream()) {
+            Files.copy(in, Paths.get(String.format("images/%s/%d.png", folder, id)));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void populatePokemon() {
@@ -69,8 +88,26 @@ public class PopulateDbWithPokeData {
     }
 
     private List<Pokemon> getPokemon() {
+        Map<Integer, Integer> generations = new HashMap<>();
+        client.getGenerations().forEach(generationDTO -> {
+            int generationNo = generationDTO.id;
+            generationDTO.species.stream()
+                    .map(this::getPokedexNumberFromUrl)
+                    .forEach(pokemonNo -> {
+                        if (generations.containsKey(pokemonNo))
+                            throw new InternalException("Generations map already contained pokemon no: " + pokemonNo);
+                        generations.put(pokemonNo, generationNo);
+                    });
+        });
+
         List<Pokemon> pokemon = client.getPokemon().stream()
-                .map(dto -> new Pokemon(dto.id, dto.name, dto.sprites.frontDefault, dto.sprites.other.officialArtwork.frontDefault))
+                .map(dto -> {
+                    String listImage = dto.sprites.frontDefault;
+                    String descriptionImage = dto.sprites.other.officialArtwork.frontDefault;
+                    downloadAndSaveImage(dto.id, listImage, "list");
+                    downloadAndSaveImage(dto.id, descriptionImage, "description");
+                    return new Pokemon(dto.id, dto.name, generations.get(dto.id));
+                })
                 .collect(Collectors.toList());
 
         pokemon.forEach(p ->

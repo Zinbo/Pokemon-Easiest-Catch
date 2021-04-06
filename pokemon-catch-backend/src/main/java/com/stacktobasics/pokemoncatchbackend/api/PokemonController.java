@@ -28,6 +28,7 @@ public class PokemonController {
         log.info("Populated pokemon and evolution chains.");
     }
 
+
     @GetMapping()
     public Iterable<Pokemon> getPokemon() {
         return pokemonRepository.findAll();
