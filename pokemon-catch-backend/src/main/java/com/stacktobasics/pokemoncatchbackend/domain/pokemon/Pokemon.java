@@ -1,10 +1,11 @@
-package com.stacktobasics.pokemoncatchbackend.domain;
+package com.stacktobasics.pokemoncatchbackend.domain.pokemon;
 
+import com.stacktobasics.pokemoncatchbackend.domain.AggregateRoot;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 
-import static com.stacktobasics.pokemoncatchbackend.domain.Game.UNUSED_GAMES;
+import static com.stacktobasics.pokemoncatchbackend.domain.game.Game.UNUSED_GAMES;
 
 @Slf4j
 @Getter
@@ -25,9 +26,9 @@ public class Pokemon implements AggregateRoot {
         this.generation = generation;
     }
 
-    public void addEncounter(int catchRate, @NonNull String location, @NonNull String gameName,
+    public void addEncounter(int catchRate, @NonNull String location, @NonNull int gameId,
                              @NonNull String method, @NonNull String condition) {
-         if(UNUSED_GAMES.contains(gameName)) return;
-         encounterDetails.addEncounter(catchRate, location, gameName, method, condition);
+         if(UNUSED_GAMES.contains(gameId)) return;
+         encounterDetails.addEncounter(catchRate, location, gameId, method, condition);
     }
 }

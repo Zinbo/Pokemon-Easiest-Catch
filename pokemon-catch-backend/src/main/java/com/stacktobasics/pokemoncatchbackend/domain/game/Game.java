@@ -1,9 +1,7 @@
-package com.stacktobasics.pokemoncatchbackend.domain;
+package com.stacktobasics.pokemoncatchbackend.domain.game;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.stacktobasics.pokemoncatchbackend.domain.AggregateRoot;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
@@ -17,10 +15,11 @@ public class Game implements AggregateRoot {
     public static final List<String> UNUSED_GAMES = List.of("xd", "colosseum");
 
     @Id
-    String id;
-    String name;
+    private int id;
+    private String name;
 
-    public Game(String name) {
+    public Game(int id, @NonNull String name) {
+        this.id = id;
         this.name = name;
     }
 }

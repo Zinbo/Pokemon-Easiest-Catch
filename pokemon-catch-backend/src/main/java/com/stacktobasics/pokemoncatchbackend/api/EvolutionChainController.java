@@ -1,6 +1,5 @@
 package com.stacktobasics.pokemoncatchbackend.api;
 
-import com.stacktobasics.pokemoncatchbackend.domain.Game;
 import com.stacktobasics.pokemoncatchbackend.domain.evolution.EvolutionChain;
 import com.stacktobasics.pokemoncatchbackend.domain.evolution.EvolutionChainRepository;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package com.stacktobasics.pokemoncatchbackend.api;
 
 import com.stacktobasics.pokemoncatchbackend.PopulateDbWithPokeData;
-import com.stacktobasics.pokemoncatchbackend.domain.Pokemon;
+import com.stacktobasics.pokemoncatchbackend.domain.pokemon.Pokemon;
 import com.stacktobasics.pokemoncatchbackend.domain.PokemonRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;

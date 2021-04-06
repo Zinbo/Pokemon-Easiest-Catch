@@ -1,4 +1,4 @@
-package com.stacktobasics.pokemoncatchbackend.domain;
+package com.stacktobasics.pokemoncatchbackend.domain.pokemon;
 
 import lombok.NonNull;
 
@@ -8,12 +8,12 @@ import java.util.Optional;
 
 public class EncounterDetails {
     private int bestCatchRate = -1;
-    private List<Encounter> encounters = new ArrayList<>();
+    private final List<Encounter> encounters = new ArrayList<>();
 
-    protected void addEncounter(int catchRate, @NonNull String location, @NonNull String gameName,
+    protected void addEncounter(int catchRate, @NonNull String location, @NonNull int gameId,
                                 @NonNull String method, @NonNull String condition) {
         Optional<Encounter> existingEncounter =
-                encounters.stream().filter(e -> e.getLocationName().equals(location) && e.getLocation().getGame().equals(gameName)
+                encounters.stream().filter(e -> e.getLocationName().equals(location) && e.getLocation().getGameId() == gameId
                         && e.getMethod().equals(method) && e.getCondition().equals(condition)).findFirst();
         existingEncounter.ifPresentOrElse(
                 e -> {
@@ -21,7 +21,7 @@ public class EncounterDetails {
                     updateBestCatchRate(e);
                 },
                 () -> {
-                    Encounter e = new Encounter(catchRate, location, gameName, method, condition);
+                    Encounter e = new Encounter(catchRate, location, gameId, method, condition);
                     encounters.add(e);
                     updateBestCatchRate(e);
                 });

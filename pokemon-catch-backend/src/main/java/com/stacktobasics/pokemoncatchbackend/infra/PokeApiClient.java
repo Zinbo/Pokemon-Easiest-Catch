@@ -1,18 +1,19 @@
 package com.stacktobasics.pokemoncatchbackend.infra;
 
-import com.stacktobasics.pokemoncatchbackend.infra.dtos.EncounterDTO;
-import com.stacktobasics.pokemoncatchbackend.infra.dtos.GamesDTO;
-import com.stacktobasics.pokemoncatchbackend.infra.dtos.GenerationDTO;
-import com.stacktobasics.pokemoncatchbackend.infra.dtos.PokemonDTO;
+import com.stacktobasics.pokemoncatchbackend.InternalException;
+import com.stacktobasics.pokemoncatchbackend.infra.dtos.*;
+import com.stacktobasics.pokemoncatchbackend.infra.dtos.evolution.NamedResourceDTO;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.evolution.PokemonEvolutionDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class PokeApiClient {
@@ -27,9 +28,43 @@ public class PokeApiClient {
         this.shouldGetAllPokemon = shouldGetAllPokemon;
     }
 
-    public GamesDTO getGames() {
-        String url = POKEAPI_BASE_URL + "version/?limit=40";
-        return restTemplate.getForObject(url, GamesDTO.class);
+    public List<GameDTO> getGames() {
+        boolean done = false;
+        List<GameDTO> games = new ArrayList<>();
+        int i = 1;
+        while(!done) {
+            try {
+                String url = String.format("%s/version/%s", POKEAPI_BASE_URL, i++);
+                games.add(restTemplate.getForObject(url, GameDTO.class));
+            } catch(HttpClientErrorException e) {
+                if(e.getRawStatusCode() == 404) done = true;
+                else throw e;
+            }
+        }
+        return games;
+    }
+
+    public String getEnglishName(String url) {
+        return Optional.ofNullable(getNames(url))
+                .map(dto ->
+                dto.names.stream()
+                    .filter(n -> n.language.name.equals("en")).findFirst()
+                    .map(n -> n.name).orElse(StringUtils.capitalize(dto.name)))
+                .orElseThrow(() -> new InternalException("Could not get name for URL: " + url));
+    }
+
+    public NamesDTO getNames(String url) {
+        return restTemplate.getForObject(url, NamesDTO.class);
+    }
+
+    public String getLocationName(String url) {
+        return Optional.ofNullable(restTemplate.getForObject(url, LocationAreaDTO.class))
+        .map(dto ->
+                dto.names.stream()
+                        .filter(n -> n.language.name.equals("en")).findFirst()
+                        .flatMap(n -> StringUtils.isEmpty(n.name) ? Optional.empty() : Optional.of(n.name))
+                        .orElseGet(() -> getEnglishName(dto.location.url)))
+                .orElseThrow(() -> new InternalException("Could not get location name for URL: " + url));
     }
 
     public List<PokemonDTO> getPokemon() {

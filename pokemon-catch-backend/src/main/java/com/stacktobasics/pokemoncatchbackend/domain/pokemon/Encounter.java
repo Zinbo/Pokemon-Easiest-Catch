@@ -1,4 +1,4 @@
-package com.stacktobasics.pokemoncatchbackend.domain;
+package com.stacktobasics.pokemoncatchbackend.domain.pokemon;
 
 import com.stacktobasics.pokemoncatchbackend.domain.exceptions.InvalidInputException;
 import lombok.Getter;
@@ -15,13 +15,13 @@ public class Encounter {
     String method;
     String condition;
 
-    public Encounter(@NonNull int catchRate, @NonNull String location, @NonNull String gameName,
+    public Encounter(@NonNull int catchRate, @NonNull String location, int gameId,
                      @NonNull String method, @NonNull String condition) {
         this.method = method;
         this.condition = condition;
         if(catchRate <= 0) throw new InvalidInputException("Catch rate cannot be below 0");
         this.catchRate = catchRate;
-        this.location = new Location(location, gameName);
+        this.location = new Location(location, gameId);
     }
 
     public String getLocationName() {

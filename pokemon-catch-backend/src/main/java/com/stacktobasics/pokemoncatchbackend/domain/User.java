@@ -1,12 +1,13 @@
 package com.stacktobasics.pokemoncatchbackend.domain;
 
+import com.stacktobasics.pokemoncatchbackend.domain.game.Game;
+import com.stacktobasics.pokemoncatchbackend.domain.pokemon.Pokemon;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -29,7 +30,7 @@ public class User {
     public void replaceGames(@NonNull List<String> gameNames, @NonNull GameRepository gameRepository) {
         List<Game> savedGames = gameRepository.findAll();
         ownedGames = gameNames.stream().flatMap(gameName -> {
-            Optional<Game> matchedGame = savedGames.stream().filter(savedGame -> savedGame.name.equals(gameName)).findFirst();
+            Optional<Game> matchedGame = savedGames.stream().filter(savedGame -> savedGame.getName().equals(gameName)).findFirst();
             return matchedGame.stream();
         }).collect(Collectors.toSet());
     }
