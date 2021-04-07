@@ -1,14 +1,20 @@
 package com.stacktobasics.pokemoncatchbackend.domain.pokemon;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class EncounterDetails {
     private int bestCatchRate = -1;
-    private final List<Encounter> encounters = new ArrayList<>();
+    private List<Encounter> encounters = new ArrayList<>();
 
     protected void addEncounter(int catchRate, @NonNull String location, @NonNull int gameId,
                                 @NonNull String method, @NonNull String condition) {

@@ -1,12 +1,12 @@
 package com.stacktobasics.pokemoneasycatch
 
-data class Game(val name: String) {
+data class Game(val id: Int, val name: String) {
     override fun toString(): String {
         return name
     }
 }
 
-data class Pokemon(val pokedexNumber: Int, val name: String, val imageId: String, val officialImage: String,
+data class Pokemon(val pokedexNumber: Int, val name: String, val generation: Int,
     val encounterDetails: EncounterDetails, val evolutionChainId: Int) {
 
     override fun equals(other: Any?): Boolean {
@@ -34,7 +34,7 @@ data class EncounterDetails(val bestCatchRate: Int, val encounters: List<Encount
 
 data class Encounter(val catchRate: Int, val location: Location, val method: String, val condition: String)
 
-data class Location(val name: String, val game: String)
+data class Location(val name: String, val gameId: Int)
 
 data class User(val id: String, val ownedGames: MutableSet<Game>, val ownedPokemon: MutableSet<Pokemon>) {
     override fun equals(other: Any?): Boolean {
@@ -45,6 +45,7 @@ data class User(val id: String, val ownedGames: MutableSet<Game>, val ownedPokem
 
 object Store {
     var allGames: List<Game> = emptyList()
+    var gamesById: Map<Int, Game> = emptyMap();
     var allPokemon: List<Pokemon> = emptyList()
     var allEvolutionChains: List<EvolutionChain> = emptyList()
     lateinit var user: User

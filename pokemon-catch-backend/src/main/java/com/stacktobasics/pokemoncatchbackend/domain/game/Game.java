@@ -12,7 +12,7 @@ import java.util.List;
 @EqualsAndHashCode(of = "id")
 public class Game implements AggregateRoot {
 
-    public static final List<String> UNUSED_GAMES = List.of("xd", "colosseum");
+    public static final List<Integer> UNUSED_GAMES = List.of(19, 20);
 
     @Id
     private int id;

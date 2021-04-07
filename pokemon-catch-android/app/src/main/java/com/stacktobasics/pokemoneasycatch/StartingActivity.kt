@@ -19,6 +19,7 @@ class StartingActivity : AppCompatActivity() {
         val getData = Observable.merge(RestClient.backendAPI.getGames()
             .doOnNext { games ->
                 Store.allGames = games
+                Store.gamesById = games.map {it.id to it}.toMap()
                 Store.filterOptions.selectedGame = null
             },
             RestClient.backendAPI.getPokemon()

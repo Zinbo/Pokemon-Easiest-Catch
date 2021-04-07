@@ -61,7 +61,7 @@ public class PopulateDbWithPokeData {
     public void populateGames() {
         List<GameDTO> games = client.getGames();
         games.stream()
-            .filter(newGame -> !(UNUSED_GAMES.contains(newGame.name.toLowerCase())))
+            .filter(game -> !(UNUSED_GAMES.contains(game.id)))
             .forEach(game -> {
                 String englishName = game.names.stream().filter(n -> n.language.name.equals("en")).findFirst()
                         .map(n -> n.name).orElseGet(() -> {

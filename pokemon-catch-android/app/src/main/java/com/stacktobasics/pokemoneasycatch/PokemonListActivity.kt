@@ -152,7 +152,7 @@ class PokemonAdapter(val context: Context, val pokemon: List<Pokemon>, val start
 
         val imageView = ImageView(context)
         val pokemon = pokemon[position]
-        Picasso.get().load(pokemon.imageId).into(imageView)
+        Picasso.get().load("${RestClient.url}images/list/${pokemon.pokedexNumber}.png").into(imageView)
 
         val set = ConstraintSet()
         imageView.id = 100
@@ -374,9 +374,9 @@ fun pokemonCanBeObtained(pokemon : Pokemon) : Boolean {
 
 fun pokemonCanBeCaught(pokemon : Pokemon, games : Collection<Game>) : Boolean {
     if(games == Store.allGames) return true
-    val gameNames: List<String> = games.map { game -> game.name }
-    for (encounteredGame in pokemon.encounterDetails.encounters.map { encounter -> encounter.location.game }) {
-        if (gameNames.contains(encounteredGame)) return true
+    val gameIds: List<Int> = games.map { game -> game.id }
+    for (encounteredGame in pokemon.encounterDetails.encounters.map { encounter -> encounter.location.gameId }) {
+        if (gameIds.contains(encounteredGame)) return true
     }
     return false
 }
@@ -388,14 +388,14 @@ fun pokemonHasBestCatchRateInSelectedGameOutOfOwnedGames(pokemon: Pokemon) : Boo
 
     var bestCatchRateForSelectedGame = -1
     for (encounter in pokemon.encounterDetails.encounters) {
-        if(selectedGame.name != encounter.location.game) continue
+        if(selectedGame.id != encounter.location.gameId) continue
         bestCatchRateForSelectedGame = max(bestCatchRateForSelectedGame, encounter.catchRate)
     }
     if(bestCatchRateForSelectedGame == -1) return false
 
-    val ownedGamesNames = Store.user.ownedGames.map { g -> g.name }
+    val ownedGames = Store.user.ownedGames.map { g -> g.id }
     for (encounter in pokemon.encounterDetails.encounters) {
-        if(!ownedGamesNames.contains(encounter.location.game)) continue
+        if(!ownedGames.contains(encounter.location.gameId)) continue
         if(encounter.catchRate > bestCatchRateForSelectedGame) return false
     }
     return true
@@ -403,8 +403,8 @@ fun pokemonHasBestCatchRateInSelectedGameOutOfOwnedGames(pokemon: Pokemon) : Boo
 
 fun pokemonCanBeCaught(pokemon : Pokemon, game : Game?) : Boolean {
     if(game == null) return true
-    for (encounteredGame in pokemon.encounterDetails.encounters.map { encounter -> encounter.location.game }) {
-        if (encounteredGame == game.name) return true
+    for (encounteredGame in pokemon.encounterDetails.encounters.map { encounter -> encounter.location.gameId }) {
+        if (encounteredGame == game.id) return true
     }
     return false
 }

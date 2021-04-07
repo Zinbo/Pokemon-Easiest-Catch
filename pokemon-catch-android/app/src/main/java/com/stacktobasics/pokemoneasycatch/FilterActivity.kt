@@ -61,7 +61,7 @@ class FilterActivity : AppCompatActivity() {
 
     private fun setupSpinner(context: Context) : Spinner {
         val allGamesPlusExtra = Store.allGames.toMutableList()
-        allGamesPlusExtra.add(0, Game(ALL_GAMES_SELECTION))
+        allGamesPlusExtra.add(0, Game(0, ALL_GAMES_SELECTION))
         val gamesAdapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, allGamesPlusExtra)
         val spinner = findViewById<Spinner>(R.id.gameToShowSpinner)
         val selectedGame = Store.filterOptions.selectedGame

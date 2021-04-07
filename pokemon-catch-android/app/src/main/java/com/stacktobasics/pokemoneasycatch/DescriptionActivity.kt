@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import com.stacktobasics.pokemoneasycatch.RestClient.url
 import kotlinx.android.synthetic.main.activity_description.*
 
 class DescriptionActivity : AppCompatActivity() {
@@ -29,7 +30,7 @@ class DescriptionActivity : AppCompatActivity() {
         pokemonName.text = pokemon.name.capitalize()
         val imageLayout = findViewById<ConstraintLayout>(R.id.imageLayout)
         val imageView = ImageView(context)
-        Picasso.get().load(pokemon.officialImage).into(imageView)
+        Picasso.get().load("${url}images/description/${pokemon.pokedexNumber}.png").into(imageView)
         imageView.adjustViewBounds = true
 
         drawEncountersTable(pokemon, context)
@@ -135,7 +136,7 @@ class DescriptionActivity : AppCompatActivity() {
         var iterator = encountersSortedByCatchRate.iterator()
         while(iterator.hasNext()) {
             val encounter = iterator.next()
-            if(Store.user.ownedGames.find { it.name == encounter.location.game } == null) iterator.remove()
+            if(Store.user.ownedGames.find { it.id == encounter.location.gameId } == null) iterator.remove()
         }
 
         val rvContacts = findViewById<RecyclerView>(R.id.encountersTable)

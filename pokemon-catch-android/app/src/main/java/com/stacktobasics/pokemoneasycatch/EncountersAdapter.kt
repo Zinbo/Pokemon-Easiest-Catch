@@ -38,7 +38,7 @@ class EncountersAdapter(private val encounters: List<Encounter>) : RecyclerView.
         val encounter= encounters[position]
         // Set item views based on your views and data model
         val game = holder.game
-        game.text = encounter.location.game
+        game.text = Store.gamesById[encounter.location.gameId]?.name ?: throw RuntimeException("Could not find game with id: [${encounter.location.gameId}]")
 
         val catchRate = holder.catchRate
         catchRate.text = encounter.catchRate.toString()
