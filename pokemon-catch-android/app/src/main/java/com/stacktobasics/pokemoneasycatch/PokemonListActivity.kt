@@ -8,10 +8,7 @@ import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.BaseAdapter
-import android.widget.GridView
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -24,14 +21,14 @@ import kotlin.math.max
 import kotlin.random.Random
 
 
-class PokemonListActivity : AppCompatActivity() {
+class PokemonListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
+
+    private lateinit var gridview: GridView
 
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pokemon_list)
-
-
         drawPokemonGridView()
     }
 
@@ -40,7 +37,7 @@ class PokemonListActivity : AppCompatActivity() {
         // need to remove pokemon not in owned games if hideUnobtainablePokemon is true
         // need to remove pokemon in ownedPokemon list if hideOwnedPokemon is true
         val pokemonToShow = mutableListOf<Pokemon>()
-        val gridview = findViewById<GridView>(R.id.gridview)
+        gridview = findViewById(R.id.gridview)
         Store.allPokemon.forEach { pokemon ->
 
             var shouldHideBecauseOwned = false
@@ -61,7 +58,13 @@ class PokemonListActivity : AppCompatActivity() {
                     (Store.filterOptions.hideUnobtainablePokemon && shouldHideBecauseUnobtainable) ||
                     shouldHideBecauseCannotBeCaughtInSelectedGame
 
-            if (!shouldHide) pokemonToShow.add(pokemon)
+            val matchesSearchCriteria : Boolean = if(Store.search.isBlank()) {
+                true
+            } else {
+                pokemon.name.contains(Store.search, true)
+            }
+
+            if (!shouldHide && matchesSearchCriteria) pokemonToShow.add(pokemon)
         }
 
 
@@ -83,9 +86,24 @@ class PokemonListActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.list_view_menu, menu)
+
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as SearchView
+        searchView.setOnQueryTextListener(this)
         return true
+    }
+
+    override fun onQueryTextChange(query: String?): Boolean {
+        if(query == null) Store.search = ""
+        else Store.search = query
+        drawPokemonGridView()
+        return true
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

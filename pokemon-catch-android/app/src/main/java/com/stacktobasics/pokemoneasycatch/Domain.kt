@@ -51,6 +51,7 @@ object Store {
     lateinit var user: User
     var filterOptions = FilterOptions
     var sort = SortOptions.NUMBER_ASC
+    var search = ""
 }
 
 object FilterOptions {

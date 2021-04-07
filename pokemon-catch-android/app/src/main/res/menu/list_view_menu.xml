@@ -54,4 +54,9 @@
         android:title="@string/action_settings"
         app:showAsAction="always"/>
 
+    <item android:id="@+id/action_search"
+        android:title="@string/action_search"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="always"/>
+
 </menu>
