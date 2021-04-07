@@ -2,26 +2,27 @@ package com.stacktobasics.pokemoncatchbackend.infra;
 
 import com.stacktobasics.pokemoncatchbackend.InternalException;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.*;
-import com.stacktobasics.pokemoncatchbackend.infra.dtos.evolution.NamedResourceDTO;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.evolution.PokemonEvolutionDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.*;
 
 @Component
+@Slf4j
 public class PokeApiClient {
 
     public static final String POKEAPI_BASE_URL = "https://pokeapi.co/api/v2/";
     private final RestTemplate restTemplate;
     private final boolean shouldGetAllPokemon;
     public static final int LAST_GENERATION = 8;
+    public static final Map<String, Object> cache = new HashMap<>();
 
     public PokeApiClient(@Value("${feature-toggle.should-get-all-pokemon}") boolean shouldGetAllPokemon) {
         this.restTemplate = new RestTemplate();
@@ -35,7 +36,7 @@ public class PokeApiClient {
         while(!done) {
             try {
                 String url = String.format("%s/version/%s", POKEAPI_BASE_URL, i++);
-                games.add(restTemplate.getForObject(url, GameDTO.class));
+                games.add(getDTO(url, GameDTO.class));
             } catch(HttpClientErrorException e) {
                 if(e.getRawStatusCode() == 404) done = true;
                 else throw e;
@@ -54,17 +55,30 @@ public class PokeApiClient {
     }
 
     public NamesDTO getNames(String url) {
-        return restTemplate.getForObject(url, NamesDTO.class);
+        return getDTO(url, NamesDTO.class);
     }
 
     public String getLocationName(String url) {
-        return Optional.ofNullable(restTemplate.getForObject(url, LocationAreaDTO.class))
+        return Optional.ofNullable(getDTO(url, LocationAreaDTO.class))
         .map(dto ->
                 dto.names.stream()
                         .filter(n -> n.language.name.equals("en")).findFirst()
                         .flatMap(n -> StringUtils.isEmpty(n.name) ? Optional.empty() : Optional.of(n.name))
                         .orElseGet(() -> getEnglishName(dto.location.url)))
                 .orElseThrow(() -> new InternalException("Could not get location name for URL: " + url));
+    }
+
+    public <T> T getDTO(String url, Class<T> clazz){
+        if(cache.containsKey(url)) {
+            log.info("Returning object from cache for url: [{}]", url);
+            return (T) cache.get(url);
+        }
+        LocalTime before = LocalTime.now();
+        T dto = restTemplate.getForObject(url, clazz);
+        cache.put(url, dto);
+        LocalTime after = LocalTime.now();
+        log.info("Call to [{}] took [{}] milliseconds", url, Duration.between(before, after).toMillis());
+        return dto;
     }
 
     public List<PokemonDTO> getPokemon() {
@@ -76,7 +90,7 @@ public class PokeApiClient {
         List<GenerationDTO> generations = new ArrayList<>();
         for (int i = 1; i <= LAST_GENERATION; i++) {
             String url = String.format("%s/generation/%s", POKEAPI_BASE_URL, i);
-            generations.add(restTemplate.getForObject(
+            generations.add(getDTO(
                     url,
                     GenerationDTO.class));
         }
@@ -86,8 +100,9 @@ public class PokeApiClient {
     private List<PokemonDTO> getFirst50Pokemon() {
         List<PokemonDTO> pokemons = new ArrayList<>();
         for (int i = 1; i <= 50; i++) {
+            if(i % 10 == 0) log.info("got {} pokemon...", i);
             String url = String.format("%s/pokemon/%s", POKEAPI_BASE_URL, i);
-            PokemonDTO pokemon = restTemplate.getForObject(
+            PokemonDTO pokemon = getDTO(
                     url,
                     PokemonDTO.class);
             pokemons.add(pokemon);
@@ -104,7 +119,7 @@ public class PokeApiClient {
         List<PokemonEvolutionDTO> allEvolutionChains = new ArrayList<>();
         for (int i = 1; i <= 20; i++) {
             String url = String.format("%s/evolution-chain/%s", POKEAPI_BASE_URL, i);
-            PokemonEvolutionDTO pokemon = restTemplate.getForObject(
+            PokemonEvolutionDTO pokemon = getDTO(
                     url,
                     PokemonEvolutionDTO.class);
             allEvolutionChains.add(pokemon);
@@ -119,7 +134,7 @@ public class PokeApiClient {
         while(!done) {
             try {
                 String url = String.format("%s/evolution-chain/%s", POKEAPI_BASE_URL, i++);
-                allEvolutionChains.add(restTemplate.getForObject(url, PokemonEvolutionDTO.class));
+                allEvolutionChains.add(getDTO(url, PokemonEvolutionDTO.class));
             } catch(HttpClientErrorException e) {
                 if(e.getRawStatusCode() == 404) done = true;
                 else throw e;
@@ -135,7 +150,7 @@ public class PokeApiClient {
         while(!done) {
             try {
                 String url = String.format("%s/pokemon/%s", POKEAPI_BASE_URL, i++);
-                allPokemon.add(restTemplate.getForObject(url, PokemonDTO.class));
+                allPokemon.add(getDTO(url, PokemonDTO.class));
             } catch(HttpClientErrorException e) {
                 if(e.getRawStatusCode() == 404) done = true;
                 else throw e;
@@ -146,7 +161,7 @@ public class PokeApiClient {
 
     public List<EncounterDTO> getEncountersForPokemon(Integer id) {
         String url = String.format("%s/pokemon/%s/encounters", POKEAPI_BASE_URL, id);
-        EncounterDTO[] dtos = restTemplate.getForObject(url, EncounterDTO[].class);
+        EncounterDTO[] dtos = getDTO(url, EncounterDTO[].class);
         if(dtos == null) return new ArrayList<>();
         return Arrays.asList(dtos);
     }

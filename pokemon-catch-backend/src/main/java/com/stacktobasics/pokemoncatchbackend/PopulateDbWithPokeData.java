@@ -9,9 +9,11 @@ import com.stacktobasics.pokemoncatchbackend.domain.evolution.EvolutionChainRepo
 import com.stacktobasics.pokemoncatchbackend.infra.PokeApiClient;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.EvolutionNode;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.GameDTO;
+import com.stacktobasics.pokemoncatchbackend.infra.dtos.GenerationDTO;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.NamesDTO;
 import com.stacktobasics.pokemoncatchbackend.infra.dtos.evolution.*;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 import static com.stacktobasics.pokemoncatchbackend.domain.game.Game.UNUSED_GAMES;
 
 @Component
+@Slf4j
 public class PopulateDbWithPokeData {
 
     public static final int FEMALE = 1;
@@ -99,7 +102,10 @@ public class PopulateDbWithPokeData {
 
     private List<Pokemon> getPokemon() {
         Map<Integer, Integer> generations = new HashMap<>();
-        client.getGenerations().forEach(generationDTO -> {
+        log.info("Getting generations...");
+        List<GenerationDTO> generationDTOs = client.getGenerations();
+        log.info("Got generations.");
+        generationDTOs.forEach(generationDTO -> {
             int generationNo = generationDTO.id;
             generationDTO.species.stream()
                     .map(this::getPokedexNumberFromUrl)
@@ -110,6 +116,7 @@ public class PopulateDbWithPokeData {
                     });
         });
 
+        log.info("Getting pokemon...");
         List<Pokemon> pokemon = client.getPokemon().stream()
                 .map(dto -> {
                     String listImage = dto.sprites.frontDefault;
@@ -119,29 +126,36 @@ public class PopulateDbWithPokeData {
                     return new Pokemon(dto.id, client.getEnglishName(dto.species.url), generations.get(dto.id));
                 })
                 .collect(Collectors.toList());
+        log.info("Got pokemon.");
 
+        log.info("building pokemon...");
         pokemon.forEach(p ->
+        {
+            log.info("Building pokemon: {}...", p.getPokedexNumber());
             client.getEncountersForPokemon(p.getPokedexNumber())
-                .forEach(dto ->
-                        dto.versionDetails.forEach(v ->
-                                v.encounterDetails.forEach(ed -> {
-                                    String locationArea = client.getLocationName(dto.locationArea.url);
-                                    NamesDTO names = client.getNames(v.version.url);
-                                    if(names == null) {
-                                        System.out.println(names);
-                                    }
-                                    int gameId = names.id;
+                    .forEach(dto ->
+                            dto.versionDetails.forEach(v ->
+                                    v.encounterDetails.forEach(ed -> {
+                                        String locationArea = client.getLocationName(dto.locationArea.url);
+                                        NamesDTO names = client.getNames(v.version.url);
+                                        if(names == null) {
+                                            System.out.println(names);
+                                        }
+                                        int gameId = names.id;
 
-                                    String method = client.getEnglishName(ed.method.url);
-                                    if(CollectionUtils.isEmpty(ed.conditionalValues)) {
-                                        p.addEncounter(ed.chance, locationArea,
-                                                gameId, method, "none");
-                                    }
-                                    else ed.conditionalValues.forEach(cv ->
+                                        String method = client.getEnglishName(ed.method.url);
+                                        if(CollectionUtils.isEmpty(ed.conditionalValues)) {
                                             p.addEncounter(ed.chance, locationArea,
-                                                    gameId, method, client.getEnglishName(cv.url)));
+                                                    gameId, method, "none");
+                                        }
+                                        else ed.conditionalValues.forEach(cv ->
+                                                p.addEncounter(ed.chance, locationArea,
+                                                        gameId, method, client.getEnglishName(cv.url)));
 
-                                }))));
+                                    })));
+            log.info("Built pokemon: {}.", p.getPokedexNumber());
+        });
+        log.info("built pokemon.");
         return pokemon;
     }
 
